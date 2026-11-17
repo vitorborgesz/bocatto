@@ -33,9 +33,14 @@ export function tratarErros(err, req, res, next) {
     return res.status(409).json({ erro: 'Registro relacionado não existe ou ainda está em uso' });
   }
 
-  // CHECK do PostgreSQL (ex.: estoque negativo, preço zero).
+  // CHECK do PostgreSQL (ex.: preço zero).
   if (err.parent?.code === '23514') {
     return res.status(400).json({ erro: 'Dados inválidos' });
+  }
+
+  // Valor que não serve para a coluna, como /produtos/abc num id numérico.
+  if (err.parent?.code === '22P02') {
+    return res.status(400).json({ erro: 'Parâmetro inválido' });
   }
 
   // Corpo da requisição com JSON malformado.

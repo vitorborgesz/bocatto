@@ -28,7 +28,7 @@ export async function autenticar(req, res, next) {
 }
 
 // Restringe a rota a um ou mais perfis. Usar DEPOIS de autenticar.
-// Ex.: router.get('/painel/pedidos', autenticar, exigirPerfil('restaurante'), ...)
+// Ex.: router.get('/pedidos', autenticar, exigirPerfil('admin'), ...)
 export const exigirPerfil = (...perfis) => (req, res, next) => {
   if (!perfis.includes(req.usuario?.perfil)) {
     throw new AppError(403, 'Você não tem permissão para acessar este recurso');

@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 
-export const PERFIS = ['cliente', 'restaurante'];
+// cliente: faz pedidos pelo site. admin: equipe do Bocatto (painel de pedidos e cardápio).
+export const PERFIS = ['cliente', 'admin'];
 
 export default (sequelize) =>
   sequelize.define(

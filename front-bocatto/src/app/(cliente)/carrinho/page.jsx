@@ -9,7 +9,7 @@ export default function CarrinhoPage() {
       titulo="Carrinho"
       descricao="Produtos selecionados, quantidades e subtotal."
       links={[
-        { href: '/', rotulo: 'Continuar comprando' },
+        { href: '/cardapio', rotulo: 'Continuar comprando' },
         { href: '/checkout', rotulo: 'Finalizar pedido' },
       ]}
     />

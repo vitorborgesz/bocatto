@@ -17,7 +17,8 @@ export default function HeaderCliente() {
         </Link>
 
         <nav className="flex items-center gap-5 text-sm font-medium">
-          {usuario?.perfil === 'restaurante' && <Link href="/restaurante">Painel</Link>}
+          <Link href="/cardapio">Cardápio</Link>
+          {usuario?.perfil === 'admin' && <Link href="/admin">Painel</Link>}
           {usuario && <Link href="/pedidos">Meus pedidos</Link>}
           <Link href="/carrinho">Carrinho ({quantidadeTotal})</Link>
           {usuario ? (

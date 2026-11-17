@@ -36,7 +36,7 @@ export async function buscarUsuarioAtivo(id) {
   return usuario?.ativo ? usuario : null;
 }
 
-// Cadastro público: sempre cria um CLIENTE. Contas de restaurante vêm do seed.
+// Cadastro público: sempre cria um CLIENTE. Contas admin vêm do seed.
 export async function cadastrar({ nome, email, senha }) {
   const senha_hash = await bcrypt.hash(senha, RODADAS_BCRYPT);
 

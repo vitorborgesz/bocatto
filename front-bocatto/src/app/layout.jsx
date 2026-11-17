@@ -8,7 +8,7 @@ export const metadata = {
     template: '%s | Bocatto',
   },
   description:
-    'Plataforma de delivery que conecta clientes a restaurantes e permite explorar cardápios, realizar pedidos e acompanhar seu andamento.',
+    'Delivery do Bocatto: conheça o cardápio, monte seu pedido e acompanhe a entrega.',
 };
 
 export default function RootLayout({ children }) {

@@ -24,6 +24,9 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32, 'precisa ter pelo menos 32 caracteres'),
   JWT_EXPIRES_IN: z.string().min(1).default('8h'),
 
+  // Taxa de entrega fixa, em reais, somada a todo pedido.
+  TAXA_ENTREGA: z.coerce.number().min(0).default(5),
+
   // Origens (front-ends) liberadas no CORS, separadas por vírgula.
   CORS_ORIGINS: z
     .string()

@@ -6,11 +6,11 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 const LINKS = [
-  { href: '/restaurante', rotulo: 'Pedidos' },
-  { href: '/restaurante/cardapio', rotulo: 'Cardápio' },
+  { href: '/admin', rotulo: 'Pedidos' },
+  { href: '/admin/cardapio', rotulo: 'Cardápio' },
 ];
 
-export default function HeaderRestaurante() {
+export default function HeaderAdmin() {
   const { usuario, logout } = useAuth();
   const caminho = usePathname();
 
@@ -18,7 +18,7 @@ export default function HeaderRestaurante() {
     <header className="border-b border-zinc-800 bg-zinc-900 text-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <Link href="/restaurante" className="text-xl font-bold text-marca">
+          <Link href="/admin" className="text-xl font-bold text-marca">
             Bocatto
           </Link>
           <span className="text-sm text-zinc-400">Painel · {usuario?.nome}</span>

@@ -18,8 +18,11 @@ module.exports = {
         references: { model: 'produtos', key: 'id' },
         onDelete: 'RESTRICT',
       },
-      quantidade: { type: Sequelize.INTEGER, allowNull: false },
+      // Nome e preço do produto NO MOMENTO da compra: o histórico não muda
+      // se o produto for renomeado ou tiver o preço alterado depois.
+      nome_produto: { type: Sequelize.STRING(120), allowNull: false },
       preco_unitario: { type: Sequelize.DECIMAL(10, 2), allowNull: false },
+      quantidade: { type: Sequelize.INTEGER, allowNull: false },
     });
 
     await queryInterface.sequelize.query(`

@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 
-// Categoria de restaurante (Pizza, Japonesa...), usada no filtro da página inicial.
+// Seção do cardápio (Hambúrgueres, Pizzas, Bebidas...).
 export default (sequelize) =>
   sequelize.define(
     'Categoria',

@@ -5,6 +5,10 @@ import { env } from './src/config/env.js';
 import { rotaNaoEncontrada, tratarErros } from './src/middlewares/erroMiddleware.js';
 import { sequelize } from './src/models/index.js';
 import authRoute from './src/routes/authRoute.js';
+import categoriaRoute from './src/routes/categoriaRoute.js';
+import enderecoRoute from './src/routes/enderecoRoute.js';
+import pedidoRoute from './src/routes/pedidoRoute.js';
+import produtoRoute from './src/routes/produtoRoute.js';
 
 const app = express();
 
@@ -25,11 +29,10 @@ app.get('/health', async (req, res) => {
 
 // Rotas por módulo.
 app.use('/auth', authRoute);
-// Próximos módulos:
-// app.use('/categorias', categoriaRoute);
-// app.use('/restaurantes', restauranteRoute);
-// app.use('/pedidos', pedidoRoute);
-// app.use('/painel', painelRoute);
+app.use('/categorias', categoriaRoute);
+app.use('/produtos', produtoRoute);
+app.use('/enderecos', enderecoRoute);
+app.use('/pedidos', pedidoRoute);
 
 // Precisam vir depois de todas as rotas.
 app.use(rotaNaoEncontrada);

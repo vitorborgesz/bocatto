@@ -5,7 +5,7 @@ import { useMemo, useSyncExternalStore } from 'react';
 
 export const CHAVES = {
   sessao: 'bocatto:sessao', // { token, usuario }
-  carrinho: 'bocatto:carrinho', // { restaurante, itens }
+  carrinho: 'bocatto:carrinho', // { itens }
 };
 
 const EVENTO = 'bocatto:armazenamento';

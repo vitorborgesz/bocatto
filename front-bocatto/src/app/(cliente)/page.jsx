@@ -4,13 +4,13 @@ import EmConstrucao from '@/components/ui/EmConstrucao';
 export default function InicioPage() {
   return (
     <EmConstrucao
-      titulo="Restaurantes"
-      descricao="Busca, filtro por categoria e lista de restaurantes."
+      titulo="Bocatto"
+      descricao="Apresentação do restaurante, destaques do cardápio e acesso ao pedido."
       links={[
-        { href: '/restaurantes/1', rotulo: 'Ver um restaurante' },
+        { href: '/cardapio', rotulo: 'Ver cardápio' },
         { href: '/carrinho', rotulo: 'Carrinho' },
         { href: '/login', rotulo: 'Login' },
-        { href: '/restaurante', rotulo: 'Painel do restaurante' },
+        { href: '/admin', rotulo: 'Painel do admin' },
       ]}
     />
   );

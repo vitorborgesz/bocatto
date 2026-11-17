@@ -9,7 +9,7 @@ export default function CheckoutPage() {
     <AreaProtegida perfil="cliente">
       <EmConstrucao
         titulo="Finalizar pedido"
-        descricao="Endereço de entrega, resumo dos valores e confirmação do pedido."
+        descricao="Escolher ou cadastrar o endereço, revisar os valores (com a taxa de entrega) e confirmar o pedido."
         links={[
           { href: '/carrinho', rotulo: 'Voltar ao carrinho' },
           { href: '/pedidos', rotulo: 'Meus pedidos' },

@@ -16,7 +16,7 @@ module.exports = {
 
     await queryInterface.sequelize.query(`
       ALTER TABLE usuarios
-        ADD CONSTRAINT ck_usuarios_perfil CHECK (perfil IN ('cliente', 'restaurante'))
+        ADD CONSTRAINT ck_usuarios_perfil CHECK (perfil IN ('cliente', 'admin'))
     `);
   },
 

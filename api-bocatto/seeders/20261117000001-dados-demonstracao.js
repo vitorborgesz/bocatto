@@ -1,56 +1,50 @@
 'use strict';
 
-// Dados de demonstração: categorias, 3 restaurantes com cardápio e 1 cliente.
-// Todas as contas usam a senha definida em SEED_SENHA (db-bocatto/.env).
+// Dados de demonstração: 1 admin, 1 cliente com endereço, 4 categorias e o cardápio.
+// As duas contas usam a senha definida em SEED_SENHA (db-bocatto/.env).
 // Rodar: npm run db:seed   |   Desfazer: npm run db:seed:undo
 
 const bcrypt = require('bcryptjs');
 
-const CATEGORIAS = ['Pizza', 'Hambúrguer', 'Japonesa', 'Brasileira', 'Doces'];
-
-const RESTAURANTES = [
-  {
-    email: 'pizzaria@exemplo.com',
-    dono: 'Forno da Nonna',
-    categoria: 'Pizza',
-    descricao: 'Pizzas de fermentação natural assadas no forno a lenha.',
-    taxa_entrega: 6.9,
-    tempo_entrega_minutos: 40,
-    produtos: [
-      { nome: 'Pizza Margherita', descricao: 'Molho de tomate, muçarela e manjericão.', preco: 49.9, estoque: 30 },
-      { nome: 'Pizza Calabresa', descricao: 'Calabresa artesanal e cebola roxa.', preco: 52.9, estoque: 30 },
-      { nome: 'Refrigerante lata', descricao: '350 ml.', preco: 6.5, estoque: 100 },
-    ],
-  },
-  {
-    email: 'burger@exemplo.com',
-    dono: 'Brasa Burger',
-    categoria: 'Hambúrguer',
-    descricao: 'Hambúrgueres de costela grelhados na brasa.',
-    taxa_entrega: 5.0,
-    tempo_entrega_minutos: 30,
-    produtos: [
-      { nome: 'Brasa Clássico', descricao: 'Blend 180 g, queijo prato, alface e tomate.', preco: 32.0, estoque: 40 },
-      { nome: 'Brasa Bacon', descricao: 'Blend 180 g, cheddar e bacon crocante.', preco: 36.0, estoque: 40 },
-      { nome: 'Batata frita', descricao: 'Porção média com páprica.', preco: 18.0, estoque: 50 },
-    ],
-  },
-  {
-    email: 'sushi@exemplo.com',
-    dono: 'Sakura Sushi',
-    categoria: 'Japonesa',
-    descricao: 'Combinados frescos preparados na hora.',
-    taxa_entrega: 8.0,
-    tempo_entrega_minutos: 50,
-    produtos: [
-      { nome: 'Combinado 20 peças', descricao: 'Sushis, sashimis e uramakis variados.', preco: 79.9, estoque: 20 },
-      { nome: 'Temaki salmão', descricao: 'Salmão, cream cheese e cebolinha.', preco: 29.9, estoque: 25 },
-      { nome: 'Guioza (6 un.)', descricao: 'Pastel japonês de porco grelhado.', preco: 24.9, estoque: 0 },
-    ],
-  },
+const USUARIOS = [
+  { nome: 'Equipe Bocatto', email: 'admin@bocatto.com', perfil: 'admin' },
+  { nome: 'Cliente Demonstração', email: 'cliente@bocatto.com', perfil: 'cliente' },
 ];
 
-const EMAILS = ['cliente@exemplo.com', ...RESTAURANTES.map((r) => r.email)];
+const ENDERECO_CLIENTE = {
+  rua: 'Rua das Palmeiras',
+  numero: '120',
+  complemento: 'Apto 301',
+  bairro: 'Centro',
+  cidade: 'Chapecó',
+  cep: '89801000',
+};
+
+const CARDAPIO = {
+  'Hambúrgueres': [
+    { nome: 'Bocatto Clássico', descricao: 'Blend 180 g, queijo prato, alface, tomate e molho da casa.', preco: 32.0 },
+    { nome: 'Bocatto Bacon', descricao: 'Blend 180 g, cheddar e bacon crocante.', preco: 36.0 },
+    { nome: 'Bocatto Veggie', descricao: 'Hambúrguer de grão-de-bico, rúcula e tomate seco.', preco: 34.0 },
+  ],
+  Pizzas: [
+    { nome: 'Pizza Margherita', descricao: 'Molho de tomate, muçarela e manjericão.', preco: 49.9 },
+    { nome: 'Pizza Calabresa', descricao: 'Calabresa artesanal e cebola roxa.', preco: 52.9 },
+    { nome: 'Pizza Quatro Queijos', descricao: 'Muçarela, provolone, parmesão e gorgonzola.', preco: 56.9 },
+  ],
+  Bebidas: [
+    { nome: 'Refrigerante lata', descricao: '350 ml.', preco: 6.5 },
+    { nome: 'Suco natural', descricao: 'Laranja ou limão, 500 ml.', preco: 9.9 },
+    { nome: 'Água mineral', descricao: '500 ml, com ou sem gás.', preco: 4.5 },
+  ],
+  Sobremesas: [
+    { nome: 'Brownie com sorvete', descricao: 'Brownie de chocolate meio amargo e sorvete de creme.', preco: 18.0 },
+    { nome: 'Pudim', descricao: 'Pudim de leite condensado com calda de caramelo.', preco: 12.0 },
+    { nome: 'Petit gâteau', descricao: 'Bolinho de chocolate com recheio cremoso.', preco: 22.0 },
+  ],
+};
+
+const CATEGORIAS = Object.keys(CARDAPIO);
+const EMAILS = USUARIOS.map((u) => u.email);
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -62,68 +56,48 @@ module.exports = {
     const senha_hash = await bcrypt.hash(senha, 10);
 
     await queryInterface.sequelize.transaction(async (transaction) => {
+      const usuarios = await queryInterface.bulkInsert(
+        'usuarios',
+        USUARIOS.map((u) => ({ ...u, senha_hash })),
+        { returning: ['id', 'email'], transaction },
+      );
+      const cliente = usuarios.find((u) => u.email === 'cliente@bocatto.com');
+
+      await queryInterface.bulkInsert(
+        'enderecos',
+        [{ ...ENDERECO_CLIENTE, usuario_id: cliente.id }],
+        { transaction },
+      );
+
       const categorias = await queryInterface.bulkInsert(
         'categorias',
         CATEGORIAS.map((nome) => ({ nome })),
         { returning: ['id', 'nome'], transaction },
       );
-      const categoriaId = Object.fromEntries(categorias.map((c) => [c.nome, c.id]));
 
-      await queryInterface.bulkInsert(
-        'usuarios',
-        [{ nome: 'Cliente Demonstração', email: 'cliente@exemplo.com', senha_hash, perfil: 'cliente' }],
-        { transaction },
+      const produtos = categorias.flatMap((categoria) =>
+        CARDAPIO[categoria.nome].map((produto) => ({ ...produto, categoria_id: categoria.id })),
       );
-
-      for (const r of RESTAURANTES) {
-        const [dono] = await queryInterface.bulkInsert(
-          'usuarios',
-          [{ nome: r.dono, email: r.email, senha_hash, perfil: 'restaurante' }],
-          { returning: ['id'], transaction },
-        );
-
-        const [restaurante] = await queryInterface.bulkInsert(
-          'restaurantes',
-          [{
-            usuario_id: dono.id,
-            categoria_id: categoriaId[r.categoria],
-            nome: r.dono,
-            descricao: r.descricao,
-            taxa_entrega: r.taxa_entrega,
-            tempo_entrega_minutos: r.tempo_entrega_minutos,
-          }],
-          { returning: ['id'], transaction },
-        );
-
-        await queryInterface.bulkInsert(
-          'produtos',
-          r.produtos.map((p) => ({ ...p, restaurante_id: restaurante.id })),
-          { transaction },
-        );
-      }
+      await queryInterface.bulkInsert('produtos', produtos, { transaction });
     });
   },
 
   // Remove só os dados criados acima (na ordem inversa das FKs).
+  // Pedidos das contas de demonstração saem junto (os itens caem em cascata).
   async down(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      const opcoes = { replacements: { emails: EMAILS }, transaction };
+      const opcoes = { replacements: { emails: EMAILS, categorias: CATEGORIAS }, transaction };
       await queryInterface.sequelize.query(
-        `DELETE FROM pedidos WHERE cliente_id IN (SELECT id FROM usuarios WHERE email IN (:emails))
-            OR restaurante_id IN (SELECT r.id FROM restaurantes r JOIN usuarios u ON u.id = r.usuario_id WHERE u.email IN (:emails))`,
+        'DELETE FROM pedidos WHERE usuario_id IN (SELECT id FROM usuarios WHERE email IN (:emails))',
         opcoes,
       );
-      await queryInterface.sequelize.query(
-        `DELETE FROM produtos WHERE restaurante_id IN
-           (SELECT r.id FROM restaurantes r JOIN usuarios u ON u.id = r.usuario_id WHERE u.email IN (:emails))`,
-        opcoes,
-      );
-      await queryInterface.sequelize.query(
-        'DELETE FROM restaurantes WHERE usuario_id IN (SELECT id FROM usuarios WHERE email IN (:emails))',
-        opcoes,
-      );
+      // Endereços caem em cascata junto com os usuários.
       await queryInterface.sequelize.query('DELETE FROM usuarios WHERE email IN (:emails)', opcoes);
-      await queryInterface.bulkDelete('categorias', { nome: CATEGORIAS }, { transaction });
+      await queryInterface.sequelize.query(
+        'DELETE FROM produtos WHERE categoria_id IN (SELECT id FROM categorias WHERE nome IN (:categorias))',
+        opcoes,
+      );
+      await queryInterface.sequelize.query('DELETE FROM categorias WHERE nome IN (:categorias)', opcoes);
     });
   },
 };

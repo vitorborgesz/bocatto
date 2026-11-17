@@ -3,7 +3,7 @@ import EmConstrucao from '@/components/ui/EmConstrucao';
 export const metadata = { title: 'Entrar' };
 
 // Rota: /login — usa login() do AuthContext. Depois de entrar:
-// restaurante → /restaurante, cliente → /.
+// admin → /admin, cliente → /.
 export default function LoginPage() {
   return (
     <EmConstrucao

@@ -1,0 +1,82 @@
+# Bocatto — ambiente de desenvolvimento completo
+# Sobe: PostgreSQL (db) + API Express (api) + front-end Next.js (front), com hot reload.
+# Uso (dentro desta pasta):
+#   cp .env.example .env                       # só na primeira vez; preencha os valores
+#   docker compose up --build                  # front :3000 · API :3333 · banco :5433
+#   docker compose exec api npm run db:seed    # dados de demonstração (só na primeira vez)
+#
+# Configuração: db-bocatto/.env (copie de .env.example). É a fonte única das
+# variáveis: o Compose lê o arquivo automaticamente e o repassa aos serviços.
+
+# Nome fixo do projeto: containers, rede e volumes recebem o prefixo "bocatto_".
+name: bocatto
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      # host:container — 5433 no host evita conflito com um PostgreSQL
+      # instalado localmente (que costuma ocupar a 5432).
+      - "5433:5432"
+    volumes:
+      # Volume nomeado: os dados sobrevivem a "docker compose down".
+      # Nome real no Docker: bocatto_pgdata. Para apagar tudo: docker compose down -v
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # "$$" escapa o "$" para o Compose: a variável é lida DENTRO do container.
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ../api-bocatto
+    env_file: .env
+    environment:
+      # Dentro da rede do Compose, o banco se chama "db" e escuta na 5432
+      # (sobrescreve o localhost:5433 do .env, que serve para rodar fora do Docker).
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      PORT: 3333
+    ports:
+      - "3333:3333"
+    volumes:
+      # Bind mount: o código do editor aparece dentro do container.
+      - ../api-bocatto:/app
+      # node_modules fica no container (o do host pode ter binários de outro sistema).
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    # Aplica as migrations pendentes e sobe com nodemon.
+    # --legacy-watch (polling) garante o reload em bind mounts do WSL/Docker Desktop.
+    command: sh -c "npm run db:migrate && npx nodemon --legacy-watch --watch src --watch server.js server.js"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3333/health > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  front:
+    build: ../front-bocatto
+    environment:
+      # Endereço que o NAVEGADOR usa para chamar a API (por isso localhost, e não "api").
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3333}
+      # Polling para o hot reload funcionar em bind mounts do WSL/Docker Desktop.
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../front-bocatto:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:

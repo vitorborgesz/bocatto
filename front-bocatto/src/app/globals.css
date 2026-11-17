@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Tokens da identidade visual. Valores PROVISÓRIOS: serão trocados pelos do Figma.
+   Uso nas classes: bg-marca, text-marca, hover:bg-marca-escura... */
+@theme {
+  --color-marca: #e8590c;
+  --color-marca-escura: #c2410c;
+}

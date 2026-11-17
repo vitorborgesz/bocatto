@@ -1,0 +1,13 @@
+// Onde o Sequelize CLI encontra a conexão, as migrations e os seeders.
+//
+// Migrations e seeders ficam em CommonJS (module.exports), formato que o CLI
+// lê. Como o restante da API é ESM ("type": "module"), cada uma dessas pastas
+// tem um package.json próprio declarando "commonjs".
+const path = require('path');
+
+module.exports = {
+  config: path.resolve('src', 'config', 'database.js'),
+  'models-path': path.resolve('src', 'models'),
+  'migrations-path': path.resolve('migrations'),
+  'seeders-path': path.resolve('seeders'),
+};

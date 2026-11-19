@@ -21,11 +21,12 @@ const ENDERECO_CLIENTE = {
   cep: '89801000',
 };
 
+// Fotos: arquivos em front-bocatto/public/images/produtos (servidos pelo front).
 const CARDAPIO = {
   'Hambúrgueres': [
-    { nome: 'Bocatto Clássico', descricao: 'Blend 180 g, queijo prato, alface, tomate e molho da casa.', preco: 32.0 },
-    { nome: 'Bocatto Bacon', descricao: 'Blend 180 g, cheddar e bacon crocante.', preco: 36.0 },
-    { nome: 'Bocatto Veggie', descricao: 'Hambúrguer de grão-de-bico, rúcula e tomate seco.', preco: 34.0 },
+    { nome: 'Bocatto Clássico', descricao: 'Blend 180 g, queijo prato, alface, tomate e molho da casa.', preco: 32.0, imagem_url: '/images/produtos/bocatto-classico.jpeg' },
+    { nome: 'Bocatto Bacon', descricao: 'Blend 180 g, cheddar e bacon crocante.', preco: 36.0, imagem_url: '/images/produtos/bocatto-bacon.jpg' },
+    { nome: 'Bocatto Veggie', descricao: 'Hambúrguer de grão-de-bico, rúcula e tomate seco.', preco: 34.0, imagem_url: '/images/produtos/bocatto-veggie.webp' },
   ],
   Pizzas: [
     { nome: 'Pizza Margherita', descricao: 'Molho de tomate, muçarela e manjericão.', preco: 49.9 },
@@ -77,7 +78,7 @@ module.exports = {
       );
 
       const produtos = categorias.flatMap((categoria) =>
-        CARDAPIO[categoria.nome].map((produto) => ({ ...produto, categoria_id: categoria.id })),
+        CARDAPIO[categoria.nome].map((produto) => ({ imagem_url: null, ...produto, categoria_id: categoria.id })),
       );
       await queryInterface.bulkInsert('produtos', produtos, { transaction });
     });

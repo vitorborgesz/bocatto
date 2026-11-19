@@ -3,7 +3,7 @@
 -- Cria todas as tabelas do Bocatto no banco db-bocatto, já com os dados de teste:
 --   admin@bocatto.com   (admin)   senha 123456
 --   cliente@bocatto.com (cliente) senha 123456, 2 endereços e 3 pedidos de exemplo
---   4 categorias e 12 produtos no cardápio
+--   4 categorias e 12 produtos no cardápio (hambúrgueres com foto)
 --
 -- Rode com o banco VAZIO (depois do 01_drop_bocatto.sql).
 -- No DataGrip: conecte no banco db-bocatto e execute o script inteiro.
@@ -168,6 +168,15 @@ FROM (VALUES
 ) AS p (categoria, nome, descricao, preco)
 JOIN categorias c ON c.nome = p.categoria
 ORDER BY c.id, p.nome;
+
+-- Fotos dos hambúrgueres (arquivos em front-bocatto/public/images/produtos).
+UPDATE produtos SET imagem_url = f.url
+FROM (VALUES
+  ('Bocatto Clássico', '/images/produtos/bocatto-classico.jpeg'),
+  ('Bocatto Bacon',    '/images/produtos/bocatto-bacon.jpg'),
+  ('Bocatto Veggie',   '/images/produtos/bocatto-veggie.webp')
+) AS f (nome, url)
+WHERE produtos.nome = f.nome;
 
 -- Três pedidos de exemplo do cliente, entregues no endereço "Trabalho".
 -- Os itens copiam nome e preço do cardápio; subtotal e total são calculados

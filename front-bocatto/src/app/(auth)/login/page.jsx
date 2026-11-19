@@ -1,18 +1,15 @@
-import EmConstrucao from '@/components/ui/EmConstrucao';
+import { Suspense } from 'react';
+
+import FormLogin from '@/components/auth/FormLogin';
 
 export const metadata = { title: 'Entrar' };
 
-// Rota: /login — usa login() do AuthContext. Depois de entrar:
-// admin → /admin, cliente → /.
+// Rota: /login — admin vai para /admin; cliente volta para ?voltar=... ou para o início.
+// Suspense: o formulário lê a URL (useSearchParams), que só existe no navegador.
 export default function LoginPage() {
   return (
-    <EmConstrucao
-      titulo="Entrar"
-      descricao="Formulário de e-mail e senha."
-      links={[
-        { href: '/cadastro', rotulo: 'Criar conta' },
-        { href: '/', rotulo: 'Voltar ao início' },
-      ]}
-    />
+    <Suspense>
+      <FormLogin />
+    </Suspense>
   );
 }

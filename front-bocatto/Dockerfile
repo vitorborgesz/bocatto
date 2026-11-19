@@ -9,6 +9,6 @@ RUN npm ci
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 4100
 # Servidor de desenvolvimento (hot reload). Para produção: npm run build && npm start.
 CMD ["npm", "run", "dev"]

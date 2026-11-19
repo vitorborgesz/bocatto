@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,12 +11,14 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function AreaProtegida({ perfil, children }) {
   const { usuario, carregando } = useAuth();
   const router = useRouter();
+  const caminho = usePathname();
   const permitido = Boolean(usuario) && (!perfil || usuario.perfil === perfil);
 
   useEffect(() => {
     if (carregando || permitido) return;
-    router.replace(usuario ? '/' : '/login');
-  }, [carregando, permitido, usuario, router]);
+    // Sem login: guarda a página atual para voltar a ela depois de entrar.
+    router.replace(usuario ? '/' : `/login?voltar=${encodeURIComponent(caminho)}`);
+  }, [carregando, permitido, usuario, router, caminho]);
 
   if (!permitido) {
     return <p className="py-16 text-center text-sm text-zinc-500">Carregando...</p>;

@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
-/* Tokens da identidade visual. Valores PROVISÓRIOS: serão trocados pelos do Figma.
-   Uso nas classes: bg-marca, text-marca, hover:bg-marca-escura... */
+/* Tokens da identidade visual (Figma). Uso nas classes: bg-marca, text-tinta,
+   border-borda, bg-creme, font-display... */
 @theme {
   --color-marca: #e8590c;
   --color-marca-escura: #c2410c;
+  --color-marca-clara: #ffe8d9;
+  --color-creme: #fff8f1;
+  --color-tinta: #1f1612;
+  --color-suave: #7a6a60;
+  --color-borda: #f0e2d6;
+  --color-sucesso: #2f9e44;
+  --color-erro: #e03131;
+}
+
+/* Fontes carregadas pelo next/font no layout raiz (variáveis CSS no <html>). */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-inter), ui-sans-serif, sans-serif;
 }

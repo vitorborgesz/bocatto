@@ -4,7 +4,7 @@ import { CHAVES, lerLocal, salvarLocal } from '@/utils/armazenamentoLocal';
 
 // Instância única do axios: toda chamada à API passa por aqui (via services/).
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4444',
 });
 
 // Envia o token da sessão em toda requisição.

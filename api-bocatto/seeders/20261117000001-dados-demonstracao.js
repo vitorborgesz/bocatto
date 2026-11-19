@@ -1,7 +1,7 @@
 'use strict';
 
 // Dados de demonstração: 1 admin, 1 cliente com endereço, 4 categorias e o cardápio.
-// As duas contas usam a senha definida em SEED_SENHA (db-bocatto/.env).
+// As duas contas usam a senha definida em SEED_SENHA (api-bocatto/.env).
 // Rodar: npm run db:seed   |   Desfazer: npm run db:seed:undo
 
 const bcrypt = require('bcryptjs');
@@ -51,7 +51,7 @@ module.exports = {
   async up(queryInterface) {
     const senha = process.env.SEED_SENHA;
     if (!senha || senha.length < 8) {
-      throw new Error('Defina SEED_SENHA em db-bocatto/.env (mínimo 8 caracteres) antes de rodar o seed.');
+      throw new Error('Defina SEED_SENHA em api-bocatto/.env (mínimo 8 caracteres) antes de rodar o seed.');
     }
     const senha_hash = await bcrypt.hash(senha, 10);
 

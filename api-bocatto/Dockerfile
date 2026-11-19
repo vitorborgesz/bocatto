@@ -9,7 +9,7 @@ RUN npm ci
 
 COPY . .
 
-EXPOSE 3333
+EXPOSE 4444
 # Em desenvolvimento, o docker-compose.yml substitui este comando
 # (aplica as migrations e sobe com nodemon).
 CMD ["npm", "start"]

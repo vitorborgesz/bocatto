@@ -33,5 +33,8 @@ export async function atualizar(req, res) {
   }
 
   await produto.update(req.body);
+  // Relê do banco: sem isso a resposta traz o preço como veio no corpo (12.9, número)
+  // em vez do formato DECIMAL que a API usa em todo lugar ("12.90", texto).
+  await produto.reload();
   res.json(produto);
 }

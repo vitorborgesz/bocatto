@@ -1,5 +1,5 @@
 import AreaProtegida from '@/components/auth/AreaProtegida';
-import EmConstrucao from '@/components/ui/EmConstrucao';
+import MeusPedidos from '@/components/pedidos/MeusPedidos';
 
 export const metadata = { title: 'Meus pedidos' };
 
@@ -7,11 +7,7 @@ export const metadata = { title: 'Meus pedidos' };
 export default function PedidosPage() {
   return (
     <AreaProtegida perfil="cliente">
-      <EmConstrucao
-        titulo="Meus pedidos"
-        descricao="Histórico de pedidos e acompanhamento do status."
-        links={[{ href: '/', rotulo: 'Fazer um novo pedido' }]}
-      />
+      <MeusPedidos />
     </AreaProtegida>
   );
 }

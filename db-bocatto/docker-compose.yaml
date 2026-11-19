@@ -2,7 +2,7 @@
 # Sobe: PostgreSQL (db) + API Express (api) + front-end Next.js (front), com hot reload.
 # Uso (dentro desta pasta):
 #   cp .env.example .env                       # só na primeira vez; preencha os valores
-#   docker compose up --build                  # front :3000 · API :3333 · banco :5433
+#   docker compose up --build                  # front :4100 · API :4444 · banco :5433
 #   docker compose exec api npm run db:seed    # dados de demonstração (só na primeira vez)
 #
 # Configuração: db-bocatto/.env (copie de .env.example). É a fonte única das
@@ -17,7 +17,8 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      # A imagem oficial chama de POSTGRES_DB; no Bocatto a variável é POSTGRES_DATABASE.
+      POSTGRES_DB: ${POSTGRES_DATABASE}
     ports:
       # host:container — 5433 no host evita conflito com um PostgreSQL
       # instalado localmente (que costuma ocupar a 5432).
@@ -41,9 +42,9 @@ services:
       # (sobrescreve o localhost:5433 do .env, que serve para rodar fora do Docker).
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
-      PORT: 3333
+      PORT: 4444
     ports:
-      - "3333:3333"
+      - "4444:4444"
     volumes:
       # Bind mount: o código do editor aparece dentro do container.
       - ../api-bocatto:/app
@@ -56,7 +57,7 @@ services:
     # --legacy-watch (polling) garante o reload em bind mounts do WSL/Docker Desktop.
     command: sh -c "npm run db:migrate && npx nodemon --legacy-watch --watch src --watch server.js server.js"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3333/health > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4444/health > /dev/null || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -65,11 +66,11 @@ services:
     build: ../front-bocatto
     environment:
       # Endereço que o NAVEGADOR usa para chamar a API (por isso localhost, e não "api").
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3333}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4444}
       # Polling para o hot reload funcionar em bind mounts do WSL/Docker Desktop.
       WATCHPACK_POLLING: "true"
     ports:
-      - "3000:3000"
+      - "4100:4100"
     volumes:
       - ../front-bocatto:/app
       - /app/node_modules

@@ -1,13 +1,21 @@
 import Link from 'next/link';
 
-// Layout de login e cadastro: conteúdo centralizado, sem o header da loja.
+import Mordida from '@/components/ui/Mordida';
+
+// Layout de login e cadastro: logo no topo e o formulário centralizado, sem o header da loja.
 export default function AuthLayout({ children }) {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
-      <Link href="/" className="mb-8 text-3xl font-bold text-marca">
-        Bocatto
-      </Link>
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">{children}</div>
-    </main>
+    <div className="flex flex-1 flex-col px-4">
+      <header className="flex justify-center pt-8">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="Bocatto, voltar ao início">
+          <Mordida className="h-8 w-8 text-marca" />
+          <span className="font-display text-2xl font-extrabold tracking-tight">Bocatto</span>
+        </Link>
+      </header>
+
+      <main className="flex flex-1 items-center justify-center py-12">
+        <div className="w-full max-w-[345px]">{children}</div>
+      </main>
+    </div>
   );
 }

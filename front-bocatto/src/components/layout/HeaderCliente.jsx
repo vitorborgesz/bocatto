@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { IconeSacola, IconeUsuario } from '@/components/ui/Icones';
+import Mordida from '@/components/ui/Mordida';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 
@@ -24,7 +25,8 @@ export default function HeaderCliente() {
   return (
     <header className="border-b border-borda bg-creme">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="font-display text-xl font-extrabold tracking-tight">
+        <Link href="/" className="flex items-center gap-2 font-display text-xl font-extrabold tracking-tight">
+          <Mordida className="h-7 w-7 text-marca" />
           Bocatto
         </Link>
 

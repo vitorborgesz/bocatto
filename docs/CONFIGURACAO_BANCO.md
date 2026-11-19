@@ -12,6 +12,9 @@ API Express + Sequelize em `api-bocatto/` e front Next.js em `front-bocatto/`.
 > **Regra do projeto:** a estrutura do banco é definida **pelas migrations**
 > (`api-bocatto/migrations/`). O arquivo `docs/bocatto_schema.sql` é só uma
 > fotografia para consulta. Não use esse arquivo para criar o banco.
+>
+> **Atalho pelo DataGrip:** os scripts em `db-bocatto/sql/` apagam e recriam o
+> banco inteiro, já com os dados de teste. Veja a [seção 10](#10-recriar-o-banco-pelo-datagrip-scripts-sql).
 
 ---
 
@@ -83,7 +86,7 @@ Abra o `.env` e preencha:
 | `POSTGRES_USER` | `postgres` |
 | `POSTGRES_PASSWORD` | a senha do usuário `postgres` (só no `.env`, nunca no Git) |
 | `JWT_SECRET` | uma chave gerada com o comando abaixo (mínimo 32 caracteres) |
-| `SEED_SENHA` | senha das contas de demonstração (mínimo 8 caracteres) |
+| `SEED_SENHA` | senha das contas de demonstração (desenvolvimento: `123456`) |
 | `PORT` | `4444` |
 | `CORS_ORIGINS` | `http://localhost:4100` |
 
@@ -158,12 +161,13 @@ npm run db:seed
 ```
 
 O seed cria:
-- `admin@bocatto.com` (admin) e `cliente@bocatto.com` (cliente, com um endereço);
-- 4 categorias e 12 produtos do cardápio;
-- **conta de teste para usar o site:** `teste@bocatto.com` (cliente), com um endereço e
-  3 pedidos de exemplo (entregue, cancelado e em preparo).
+- `admin@bocatto.com` (admin);
+- `cliente@bocatto.com` (cliente), com 2 endereços ("Casa" e "Trabalho") e
+  3 pedidos de exemplo (entregue, cancelado e em preparo);
+- 4 categorias e 12 produtos do cardápio.
 
-Todas as contas usam a senha definida em `SEED_SENHA` no `api-bocatto/.env`.
+As duas contas usam a senha **`123456`** (valor de `SEED_SENHA` no `api-bocatto/.env`).
+É uma senha só para desenvolvimento: não use em produção.
 
 Os seeders executados ficam registrados na tabela `SequelizeData`. Rodar
 `db:seed` de novo **não duplica** os dados.
@@ -242,3 +246,38 @@ pg_restore -h localhost -U postgres -d db-bocatto --no-owner --no-privileges boc
 ```bash
 pg_dump -h localhost -U postgres -d db-bocatto --schema-only --no-owner --no-privileges -f docs/bocatto_schema.sql
 ```
+
+---
+
+## 10. Recriar o banco pelo DataGrip (scripts SQL)
+
+Dois scripts em `db-bocatto/sql/`, para rodar no DataGrip conectado ao banco **db-bocatto**:
+
+| Script | O que faz |
+|---|---|
+| `01_drop_bocatto.sql` | **Apaga todas as tabelas e todos os dados** do Bocatto. O banco `db-bocatto` continua existindo, vazio. |
+| `02_create_bocatto.sql` | Cria todas as tabelas (igual às migrations) e os dados de teste. |
+
+Dados criados pelo `02_create_bocatto.sql`:
+
+| Conta | Perfil | Senha |
+|---|---|---|
+| `admin@bocatto.com` | admin | `123456` |
+| `cliente@bocatto.com` | cliente (2 endereços e 3 pedidos de exemplo) | `123456` |
+
+Também cria 4 categorias e 12 produtos.
+
+Como rodar:
+1. No DataGrip, abra um console no data source do PostgreSQL com o banco **db-bocatto** selecionado.
+2. Abra `01_drop_bocatto.sql` e execute o script inteiro.
+3. Abra `02_create_bocatto.sql` e execute o script inteiro.
+4. Reinicie a API (`npm run dev`), se ela estiver rodando.
+
+Os dois scripts:
+- só rodam no `db-bocatto`. Conectados em qualquer outro banco, eles param na primeira linha sem mexer em nada;
+- rodam numa transação única: se algo falhar no meio, nada é aplicado;
+- já preenchem `SequelizeMeta` e `SequelizeData`. Por isso, `npm run db:migrate` e
+  `npm run db:seed` depois deles não fazem nada e não duplicam dados.
+
+> ⚠️ Toda migration nova precisa entrar também no `02_create_bocatto.sql`, na
+> estrutura e na lista do `SequelizeMeta`. Assim o script continua igual às migrations.

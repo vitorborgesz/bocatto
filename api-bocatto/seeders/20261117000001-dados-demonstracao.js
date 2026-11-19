@@ -1,7 +1,7 @@
 'use strict';
 
 // Dados de demonstração: 1 admin, 1 cliente com endereço, 4 categorias e o cardápio.
-// As duas contas usam a senha definida em SEED_SENHA (api-bocatto/.env).
+// As duas contas usam a senha SEED_SENHA do api-bocatto/.env (padrão de desenvolvimento: 123456).
 // Rodar: npm run db:seed   |   Desfazer: npm run db:seed:undo
 
 const bcrypt = require('bcryptjs');
@@ -12,6 +12,7 @@ const USUARIOS = [
 ];
 
 const ENDERECO_CLIENTE = {
+  apelido: 'Casa',
   rua: 'Rua das Palmeiras',
   numero: '120',
   complemento: 'Apto 301',
@@ -49,9 +50,9 @@ const EMAILS = USUARIOS.map((u) => u.email);
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    const senha = process.env.SEED_SENHA;
-    if (!senha || senha.length < 8) {
-      throw new Error('Defina SEED_SENHA em api-bocatto/.env (mínimo 8 caracteres) antes de rodar o seed.');
+    const senha = process.env.SEED_SENHA || '123456';
+    if (senha.length < 6) {
+      throw new Error('SEED_SENHA precisa ter pelo menos 6 caracteres.');
     }
     const senha_hash = await bcrypt.hash(senha, 10);
 

@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import Mordida from '@/components/ui/Mordida';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mostra o conteúdo só para quem está logado (e, se informado, com o perfil certo).
@@ -16,12 +17,20 @@ export default function AreaProtegida({ perfil, children }) {
 
   useEffect(() => {
     if (carregando || permitido) return;
+    if (usuario) {
+      router.replace('/');
+      return;
+    }
     // Sem login: guarda a página atual para voltar a ela depois de entrar.
-    router.replace(usuario ? '/' : `/login?voltar=${encodeURIComponent(caminho)}`);
+    router.replace(caminho === '/' ? '/login' : `/login?voltar=${encodeURIComponent(caminho)}`);
   }, [carregando, permitido, usuario, router, caminho]);
 
   if (!permitido) {
-    return <p className="py-16 text-center text-sm text-zinc-500">Carregando...</p>;
+    return (
+      <div aria-label="Carregando" className="flex flex-1 items-center justify-center py-24">
+        <Mordida className="h-8 w-8 animate-pulse text-marca" />
+      </div>
+    );
   }
 
   return children;

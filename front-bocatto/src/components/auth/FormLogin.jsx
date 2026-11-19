@@ -4,21 +4,11 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { comVoltar, destinoDoUsuario, destinoSeguro } from '@/components/auth/destino';
 import CampoTexto from '@/components/ui/CampoTexto';
 import { IconeSeta } from '@/components/ui/Icones';
 import { useAuth } from '@/contexts/AuthContext';
 import { mensagemDeErro } from '@/services/api';
-
-// Só aceita caminhos internos ("/pedidos"), nunca "//site.com" ou URLs externas.
-function destinoSeguro(valor) {
-  return valor?.startsWith('/') && !valor.startsWith('//') ? valor : null;
-}
-
-// Para onde ir depois de entrar: admin → painel; cliente → página que pediu o login ou início.
-function destinoDoUsuario(usuario, voltar) {
-  if (usuario.perfil === 'admin') return voltar?.startsWith('/admin') ? voltar : '/admin';
-  return voltar && !voltar.startsWith('/admin') ? voltar : '/';
-}
 
 export default function FormLogin() {
   const { usuario, login } = useAuth();
@@ -81,7 +71,7 @@ export default function FormLogin() {
           type="password"
           name="senha"
           autoComplete="current-password"
-          placeholder="Mínimo de 8 caracteres"
+          placeholder="Sua senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           erro={erros.senha}
@@ -105,7 +95,7 @@ export default function FormLogin() {
       </form>
 
       <p className="mt-4 text-center">
-        <Link href="/cadastro" className="text-sm font-medium underline underline-offset-2 hover:text-marca">
+        <Link href={comVoltar('/cadastro', voltar)} className="text-sm font-medium underline underline-offset-2 hover:text-marca">
           Criar conta
         </Link>
       </p>

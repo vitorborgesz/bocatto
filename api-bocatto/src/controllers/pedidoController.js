@@ -1,6 +1,14 @@
+import { env } from '../config/env.js';
 import { STATUS_PEDIDO } from '../models/pedidoModel.js';
 import * as pedidoService from '../services/pedidoService.js';
 import { AppError } from '../utils/appError.js';
+
+// --- Público ---
+
+// Taxa fixa (TAXA_ENTREGA no .env), no mesmo formato DECIMAL dos pedidos: "5.00".
+export function taxaEntrega(req, res) {
+  res.json({ taxa_entrega: env.TAXA_ENTREGA.toFixed(2) });
+}
 
 // --- Cliente ---
 

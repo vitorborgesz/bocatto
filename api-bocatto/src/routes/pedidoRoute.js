@@ -9,6 +9,9 @@ const router = Router();
 const somenteCliente = [autenticar, exigirPerfil('cliente')];
 const somenteAdmin = [autenticar, exigirPerfil('admin')];
 
+// Público: o carrinho mostra a taxa antes do login.
+router.get('/taxa-entrega', pedidoController.taxaEntrega);
+
 // Cliente
 router.post('/', somenteCliente, validar(pedidoSchema), pedidoController.criar);
 router.get('/meus', somenteCliente, pedidoController.listarMeus);

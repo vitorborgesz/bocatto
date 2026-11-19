@@ -20,3 +20,6 @@ export function formatarDataPedido(valor) {
   // O Intl devolve "18 de jun. de 2025": tira os "de" e o ponto.
   return dataCurta.format(data).replace(/ de /g, ' ').replace('.', '');
 }
+
+// "05435020" → "05435-020" (a API guarda só os dígitos).
+export const formatarCep = (cep = '') => cep.replace(/^(\d{5})(\d{3})$/, '$1-$2');

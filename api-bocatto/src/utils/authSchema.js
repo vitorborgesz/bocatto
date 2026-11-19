@@ -8,7 +8,7 @@ export const cadastroSchema = z.object({
   email,
   senha: z
     .string()
-    .min(8, 'A senha deve ter pelo menos 8 caracteres')
+    .min(6, 'A senha deve ter pelo menos 6 caracteres')
     // O bcrypt só considera os primeiros 72 bytes da senha.
     .refine((senha) => Buffer.byteLength(senha) <= 72, 'A senha é longa demais'),
 });

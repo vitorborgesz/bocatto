@@ -66,3 +66,29 @@ export function IconeSeta(props) {
     </Icone>
   );
 }
+
+export function IconeMenos(props) {
+  return (
+    <Icone {...props}>
+      <path d="M5 12h14" />
+    </Icone>
+  );
+}
+
+export function IconeLixeira(props) {
+  return (
+    <Icone {...props}>
+      <path d="M4 7h16M10 11v6M14 11v6" />
+      <path d="M6 7l1 13h10l1-13M9 7V4h6v3" />
+    </Icone>
+  );
+}
+
+export function IconePin(props) {
+  return (
+    <Icone {...props}>
+      <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12Z" />
+      <circle cx="12" cy="9" r="2.5" />
+    </Icone>
+  );
+}

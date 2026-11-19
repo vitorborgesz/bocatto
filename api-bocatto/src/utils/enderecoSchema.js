@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
 export const enderecoSchema = z.object({
+  // Texto vazio vira null (endereço sem apelido).
+  apelido: z
+    .string()
+    .trim()
+    .max(40, 'Use até 40 caracteres')
+    .nullish()
+    .transform((apelido) => apelido || null),
   rua: z.string().trim().min(2, 'Informe a rua').max(150),
   numero: z.string().trim().min(1, 'Informe o número').max(20),
   complemento: z.string().trim().max(100).nullish(),

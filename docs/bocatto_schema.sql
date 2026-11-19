@@ -91,7 +91,8 @@ CREATE TABLE public.enderecos (
     cidade character varying(100) NOT NULL,
     cep character varying(8) NOT NULL,
     criado_em timestamp with time zone DEFAULT now() NOT NULL,
-    atualizado_em timestamp with time zone DEFAULT now() NOT NULL
+    atualizado_em timestamp with time zone DEFAULT now() NOT NULL,
+    apelido character varying(40)
 );
 
 

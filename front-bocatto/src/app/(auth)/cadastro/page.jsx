@@ -1,17 +1,15 @@
-import EmConstrucao from '@/components/ui/EmConstrucao';
+import { Suspense } from 'react';
+
+import FormCadastro from '@/components/auth/FormCadastro';
 
 export const metadata = { title: 'Criar conta' };
 
-// Rota: /cadastro — usa cadastrar() do authService (cria conta de cliente).
+// Rota: /cadastro — cria uma conta de cliente e já entra no site.
+// Suspense: o formulário lê a URL (useSearchParams), que só existe no navegador.
 export default function CadastroPage() {
   return (
-    <EmConstrucao
-      titulo="Criar conta"
-      descricao="Formulário de nome, e-mail e senha."
-      links={[
-        { href: '/login', rotulo: 'Já tenho conta' },
-        { href: '/', rotulo: 'Voltar ao início' },
-      ]}
-    />
+    <Suspense>
+      <FormCadastro />
+    </Suspense>
   );
 }

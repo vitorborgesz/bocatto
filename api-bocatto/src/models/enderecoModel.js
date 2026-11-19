@@ -6,6 +6,8 @@ export default (sequelize) =>
     'Endereco',
     {
       usuario_id: { type: DataTypes.INTEGER, allowNull: false },
+      // "Casa", "Trabalho"... (opcional)
+      apelido: { type: DataTypes.STRING(40) },
       rua: { type: DataTypes.STRING(150), allowNull: false },
       numero: { type: DataTypes.STRING(20), allowNull: false },
       complemento: { type: DataTypes.STRING(100) },

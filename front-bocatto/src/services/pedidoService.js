@@ -26,3 +26,17 @@ export async function criarPedido({ enderecoId, itens }) {
   });
   return data;
 }
+
+// --- Admin ---
+
+// Todos os pedidos (com itens e { cliente: { id, nome, email } }), do mais recente ao mais antigo.
+export async function listarTodosPedidos() {
+  const { data } = await api.get('/pedidos');
+  return data;
+}
+
+// Avança ou cancela um pedido. A API só aceita as transições do fluxo. Devolve o pedido atualizado.
+export async function alterarStatusPedido(id, status) {
+  const { data } = await api.patch(`/pedidos/${id}/status`, { status });
+  return data;
+}

@@ -5,7 +5,8 @@ export default (sequelize) =>
     'PedidoItem',
     {
       pedido_id: { type: DataTypes.INTEGER, allowNull: false },
-      produto_id: { type: DataTypes.INTEGER, allowNull: false },
+      // Fica null se o produto for excluído depois (o item mantém nome e preço abaixo).
+      produto_id: { type: DataTypes.INTEGER },
       // Nome e preço NO MOMENTO da compra: se o produto mudar depois,
       // o histórico do pedido continua correto.
       nome_produto: { type: DataTypes.STRING(120), allowNull: false },

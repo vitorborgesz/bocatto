@@ -1,3 +1,5 @@
+import { ForeignKeyConstraintError } from 'sequelize';
+
 import { Produto } from '../models/index.js';
 import { AppError } from '../utils/appError.js';
 
@@ -37,4 +39,24 @@ export async function atualizar(req, res) {
   // em vez do formato DECIMAL que a API usa em todo lugar ("12.90", texto).
   await produto.reload();
   res.json(produto);
+}
+
+// Exclui de vez. Os pedidos antigos continuam com nome e preço do item
+// (pedido_itens.produto_id vira null: migration 20261123000001).
+export async function excluir(req, res) {
+  const produto = await Produto.findByPk(req.params.id);
+  if (!produto) {
+    throw new AppError(404, 'Produto não encontrado');
+  }
+
+  try {
+    await produto.destroy();
+  } catch (erro) {
+    // Só acontece se a migration acima ainda não foi aplicada.
+    if (erro instanceof ForeignKeyConstraintError) {
+      throw new AppError(409, 'Este produto aparece em pedidos e o banco ainda não permite excluí-lo. Rode npm run db:migrate.');
+    }
+    throw erro;
+  }
+  res.status(204).end();
 }

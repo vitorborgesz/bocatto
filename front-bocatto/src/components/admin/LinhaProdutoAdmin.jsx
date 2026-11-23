@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 
+import { IconeLixeira } from '@/components/ui/Icones';
 import Interruptor from '@/components/ui/Interruptor';
 import { mensagemDeErro } from '@/services/api';
 import { atualizarProduto } from '@/services/cardapioService';
 import { formatarMoeda } from '@/utils/formatadores';
 
-// Linha do produto no painel: foto, nome, categoria, preço, disponível e editar.
-export default function LinhaProdutoAdmin({ produto, aoAtualizar, aoEditar }) {
+// Linha do produto no painel: foto, nome, categoria, preço, disponível, editar e excluir.
+export default function LinhaProdutoAdmin({ produto, aoAtualizar, aoEditar, aoExcluir }) {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState(null);
   const [fotoFalhou, setFotoFalhou] = useState(false);
@@ -77,6 +78,15 @@ export default function LinhaProdutoAdmin({ produto, aoAtualizar, aoEditar }) {
           className="text-xs font-medium underline underline-offset-2 hover:text-marca"
         >
           Editar
+        </button>
+        <button
+          type="button"
+          onClick={() => aoExcluir(produto)}
+          aria-label={`Excluir ${produto.nome}`}
+          title="Excluir"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-suave transition-colors hover:bg-erro/10 hover:text-erro"
+        >
+          <IconeLixeira className="h-4 w-4" />
         </button>
       </div>
       <p className="mt-1 pl-[72px] font-display text-sm font-bold text-marca tabular-nums sm:hidden">

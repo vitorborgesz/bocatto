@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import ConfirmarExclusao from '@/components/admin/ConfirmarExclusao';
 import FormProduto from '@/components/admin/FormProduto';
 import LinhaProdutoAdmin from '@/components/admin/LinhaProdutoAdmin';
 import PainelCategorias from '@/components/admin/PainelCategorias';
@@ -16,6 +17,7 @@ export default function GerenciarCardapio() {
   const [tentativa, setTentativa] = useState(0);
   const [categoriaId, setCategoriaId] = useState(null); // null = todas
   const [editando, setEditando] = useState(undefined); // undefined = fechado; null = novo; objeto = edição
+  const [excluindo, setExcluindo] = useState(null); // produto a confirmar a exclusão
 
   useEffect(() => {
     let ativo = true;
@@ -54,6 +56,11 @@ export default function GerenciarCardapio() {
       return { ...atual, produtos: lista.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')) };
     });
     setEditando(undefined);
+  };
+
+  const removerProduto = (id) => {
+    setDados((atual) => ({ ...atual, produtos: atual.produtos.filter((p) => p.id !== id) }));
+    setExcluindo(null);
   };
 
   // Categoria renomeada: atualiza o nome mostrado nos produtos também.
@@ -155,6 +162,7 @@ export default function GerenciarCardapio() {
                       produto={produto}
                       aoAtualizar={salvarProduto}
                       aoEditar={setEditando}
+                      aoExcluir={setExcluindo}
                     />
                   ))}
                 </ul>
@@ -179,6 +187,12 @@ export default function GerenciarCardapio() {
           aoSalvar={salvarProduto}
           aoCancelar={() => setEditando(undefined)}
         />
+      </Modal>
+
+      <Modal aberto={Boolean(excluindo)} aoFechar={() => setExcluindo(null)} titulo="Excluir produto?">
+        {excluindo && (
+          <ConfirmarExclusao produto={excluindo} aoExcluir={removerProduto} aoCancelar={() => setExcluindo(null)} />
+        )}
       </Modal>
     </section>
   );

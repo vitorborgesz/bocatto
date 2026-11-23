@@ -12,5 +12,6 @@ router.get('/', produtoController.listarAtivos);
 router.get('/todos', somenteAdmin, produtoController.listarTodos);
 router.post('/', somenteAdmin, validar(produtoSchema), produtoController.criar);
 router.put('/:id', somenteAdmin, validar(produtoAtualizacaoSchema), produtoController.atualizar);
+router.delete('/:id', somenteAdmin, produtoController.excluir);
 
 export default router;

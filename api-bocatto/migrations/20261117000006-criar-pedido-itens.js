@@ -6,6 +6,7 @@ module.exports = {
     await queryInterface.createTable('pedido_itens', {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
       // Apagar um pedido apaga seus itens; apagar um produto já vendido é recusado.
+      // (Mudou na migration 20261123000001: excluir o produto deixa produto_id null.)
       pedido_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

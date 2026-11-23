@@ -112,10 +112,11 @@ CREATE INDEX ix_pedidos_usuario ON pedidos (usuario_id);
 CREATE INDEX ix_pedidos_status  ON pedidos (status);
 
 -- Itens com nome e preço copiados do produto no momento do pedido.
+-- Se o produto for excluído, produto_id vira NULL e o item continua no histórico.
 CREATE TABLE pedido_itens (
   id             SERIAL PRIMARY KEY,
   pedido_id      INTEGER NOT NULL REFERENCES pedidos (id)  ON DELETE CASCADE,
-  produto_id     INTEGER NOT NULL REFERENCES produtos (id) ON DELETE RESTRICT,
+  produto_id     INTEGER          REFERENCES produtos (id) ON DELETE SET NULL,
   nome_produto   VARCHAR(120)  NOT NULL,
   preco_unitario NUMERIC(10,2) NOT NULL,
   quantidade     INTEGER       NOT NULL,
@@ -233,7 +234,8 @@ INSERT INTO "SequelizeMeta" (name) VALUES
   ('20261117000005-criar-pedidos.js'),
   ('20261117000006-criar-pedido-itens.js'),
   ('20261118000001-indice-pedido-itens-produto.js'),
-  ('20261119000001-apelido-enderecos.js');
+  ('20261119000001-apelido-enderecos.js'),
+  ('20261123000001-excluir-produto-mantem-pedidos.js');
 
 INSERT INTO "SequelizeData" (name) VALUES
   ('20261117000001-dados-demonstracao.js'),

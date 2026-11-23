@@ -32,6 +32,11 @@ export async function atualizarProduto(id, campos) {
   return data;
 }
 
+// Exclui de vez. Pedidos antigos continuam com o nome e o preço do item.
+export async function excluirProduto(id) {
+  await api.delete(`/produtos/${id}`);
+}
+
 export async function criarCategoria(nome) {
   const { data } = await api.post('/categorias', { nome });
   return data;

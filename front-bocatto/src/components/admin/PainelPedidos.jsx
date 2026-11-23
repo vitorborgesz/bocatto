@@ -143,9 +143,7 @@ export default function PainelPedidos() {
             </div>
           </div>
 
-          <p className="mt-4 text-xs text-suave">
-            Atualiza sozinho a cada {ATUALIZAR_A_CADA_MS / 1000} s · última vez às {hora.format(dados.atualizadoEm)}
-          </p>
+          <p className="mt-4 text-xs text-suave">Atualizado às {hora.format(dados.atualizadoEm)}</p>
 
           {ordenados.length === 0 ? (
             <div className="mt-6 flex flex-col items-center rounded-3xl border border-borda bg-white px-6 py-14 text-center">

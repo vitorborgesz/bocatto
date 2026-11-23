@@ -123,7 +123,7 @@ ALTER SEQUENCE public.enderecos_id_seq OWNED BY public.enderecos.id;
 CREATE TABLE public.pedido_itens (
     id integer NOT NULL,
     pedido_id integer NOT NULL,
-    produto_id integer NOT NULL,
+    produto_id integer,
     nome_produto character varying(120) NOT NULL,
     preco_unitario numeric(10,2) NOT NULL,
     quantidade integer NOT NULL,
@@ -457,7 +457,7 @@ ALTER TABLE ONLY public.pedido_itens
 --
 
 ALTER TABLE ONLY public.pedido_itens
-    ADD CONSTRAINT pedido_itens_produto_id_fkey FOREIGN KEY (produto_id) REFERENCES public.produtos(id) ON DELETE RESTRICT;
+    ADD CONSTRAINT pedido_itens_produto_id_fkey FOREIGN KEY (produto_id) REFERENCES public.produtos(id) ON DELETE SET NULL;
 
 
 --

@@ -147,7 +147,7 @@ O que as migrations criam:
 | `produtos` | FK para categorias (RESTRICT); `preco > 0`; índice por categoria |
 | `enderecos` | FK para usuarios (CASCADE); índice por usuário |
 | `pedidos` | FK para usuarios (RESTRICT); status validado; `total = subtotal + taxa_entrega`; índices por usuário e por status |
-| `pedido_itens` | FK para pedidos (CASCADE) e produtos (RESTRICT); quantidade e preço positivos; um produto por pedido; índice por produto |
+| `pedido_itens` | FK para pedidos (CASCADE) e produtos (SET NULL: excluir um produto mantém o item no histórico); quantidade e preço positivos; um produto por pedido; índice por produto |
 
 > ⚠️ `npm run db:migrate:undo` **desfaz** a última migration, e isso pode apagar
 > uma tabela com dados. Só use se souber o que está desfazendo.

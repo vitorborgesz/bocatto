@@ -29,7 +29,7 @@ export function salvarLocal(chave, valor) {
   window.dispatchEvent(new Event(EVENTO));
 }
 
-export function assinarLocal(avisar) {
+function assinarLocal(avisar) {
   window.addEventListener('storage', avisar);
   window.addEventListener(EVENTO, avisar);
   return () => {

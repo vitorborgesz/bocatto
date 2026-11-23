@@ -11,8 +11,3 @@ export async function cadastrar({ nome, email, senha }) {
   const { data } = await api.post('/auth/cadastro', { nome, email, senha });
   return data;
 }
-
-export async function buscarUsuarioLogado() {
-  const { data } = await api.get('/auth/me');
-  return data;
-}

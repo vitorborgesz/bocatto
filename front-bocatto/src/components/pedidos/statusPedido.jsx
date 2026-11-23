@@ -1,5 +1,5 @@
 // Rótulo e cores de cada status (os valores vêm de STATUS_PEDIDO na API).
-export const STATUS = {
+const STATUS = {
   pendente: { rotulo: 'Pendente', cor: 'bg-amber-100 text-amber-800' },
   em_preparo: { rotulo: 'Em preparo', cor: 'bg-marca-clara text-marca' },
   saiu_para_entrega: { rotulo: 'Saiu para entrega', cor: 'bg-marca-clara text-marca' },

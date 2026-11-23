@@ -3,9 +3,7 @@ import path from 'node:path';
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
-// Rodando local (npm run dev dentro de api-bocatto/), lê api-bocatto/.env
-// (copie de .env.example). No Docker o arquivo não existe dentro do container:
-// as variáveis chegam pelo docker-compose.yaml, e esta linha não encontra nada.
+// Lê api-bocatto/.env (copie de .env.example), de qualquer pasta em que a API for iniciada.
 dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env'), quiet: true });
 
 // Todas as variáveis são validadas na inicialização. Se faltar alguma

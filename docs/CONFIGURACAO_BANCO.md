@@ -1,7 +1,7 @@
-# Configuração do banco e do ambiente local (sem Docker)
+# Configuração do banco e do ambiente local
 
-Guia para rodar o Bocatto em qualquer computador com PostgreSQL instalado:
-API Express + Sequelize em `api-bocatto/` e front Next.js em `front-bocatto/`.
+Guia passo a passo para rodar o Bocatto em qualquer computador com PostgreSQL
+instalado. A visão geral do projeto está no [README](../README.md).
 
 | Peça | Endereço |
 |---|---|
@@ -10,8 +10,7 @@ API Express + Sequelize em `api-bocatto/` e front Next.js em `front-bocatto/`.
 | PostgreSQL | localhost:5432, banco `db-bocatto` |
 
 > **Regra do projeto:** a estrutura do banco é definida **pelas migrations**
-> (`api-bocatto/migrations/`). O arquivo `docs/bocatto_schema.sql` é só uma
-> fotografia para consulta. Não use esse arquivo para criar o banco.
+> (`api-bocatto/migrations/`).
 >
 > **Atalho pelo DataGrip:** os scripts em `db-bocatto/sql/` apagam e recriam o
 > banco inteiro, já com os dados de teste. Veja a [seção 10](#10-recriar-o-banco-pelo-datagrip-scripts-sql).
@@ -241,10 +240,10 @@ pg_restore -h localhost -U postgres -d db-bocatto --no-owner --no-privileges boc
 > tabelas gera erros de "já existe". Para substituir um banco existente é preciso
 > apagá-lo antes, o que é irreversível: faça um backup dele primeiro.
 
-### Só a estrutura (como o `docs/bocatto_schema.sql`)
+### Só a estrutura (sem dados)
 
 ```bash
-pg_dump -h localhost -U postgres -d db-bocatto --schema-only --no-owner --no-privileges -f docs/bocatto_schema.sql
+pg_dump -h localhost -U postgres -d db-bocatto --schema-only --no-owner --no-privileges -f bocatto_schema.sql
 ```
 
 ---

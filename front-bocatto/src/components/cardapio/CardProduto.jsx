@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 
 import { IconeCheck, IconeMais } from '@/components/ui/Icones';
 import Mordida from '@/components/ui/Mordida';
+import { useAviso } from '@/contexts/AvisoContext';
 import { useCart } from '@/contexts/CartContext';
 import { formatarMoeda } from '@/utils/formatadores';
 
 // Card horizontal: foto (ou placeholder com a inicial da categoria) + nome, descrição e preço.
 export default function CardProduto({ produto, inicial, comMordida = false }) {
   const { adicionar } = useCart();
+  const avisar = useAviso();
   const [adicionado, setAdicionado] = useState(false);
   const [fotoFalhou, setFotoFalhou] = useState(false);
   const temFoto = Boolean(produto.imagem_url) && !fotoFalhou;
@@ -22,8 +24,13 @@ export default function CardProduto({ produto, inicial, comMordida = false }) {
   }, [adicionado]);
 
   const aoAdicionar = () => {
-    adicionar(produto);
+    const quantidade = adicionar(produto);
     setAdicionado(true);
+    avisar({
+      titulo: 'Adicionado ao carrinho',
+      texto: quantidade > 1 ? `${produto.nome} · ${quantidade} no carrinho` : produto.nome,
+      acao: { href: '/carrinho', rotulo: 'Ver carrinho' },
+    });
   };
 
   return (

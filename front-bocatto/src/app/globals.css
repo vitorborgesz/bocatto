@@ -12,6 +12,16 @@
   --color-borda: #f0e2d6;
   --color-sucesso: #2f9e44;
   --color-erro: #e03131;
+
+  /* Animação do aviso "Adicionado ao carrinho" entrando: animate-aviso. */
+  --animate-aviso: aviso-entra 220ms ease-out;
+
+  @keyframes aviso-entra {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
 }
 
 /* Fontes carregadas pelo next/font no layout raiz (variáveis CSS no <html>). */

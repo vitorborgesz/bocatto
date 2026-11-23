@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 
-import { BotaoDetalhes, CancelarPedido } from '@/components/pedidos/AcoesPedido';
+import { BotaoDetalhes } from '@/components/pedidos/AcoesPedido';
 import DetalhesPedido from '@/components/pedidos/DetalhesPedido';
 import { BadgeStatus } from '@/components/pedidos/statusPedido';
 import { formatarDataPedido, formatarMoeda } from '@/utils/formatadores';
 
-// Item do histórico: status, número, data e total. Pendente pode ser cancelado.
-export default function LinhaPedido({ pedido, aoAtualizar }) {
+// Item do histórico (entregue ou cancelado): status, número, data e total.
+export default function LinhaPedido({ pedido }) {
   const [aberto, setAberto] = useState(false);
 
   return (
@@ -22,8 +22,7 @@ export default function LinhaPedido({ pedido, aoAtualizar }) {
           </p>
         </div>
 
-        <div className="flex flex-col items-end gap-2 self-center">
-          <CancelarPedido pedido={pedido} aoCancelar={aoAtualizar} />
+        <div className="self-center">
           <BotaoDetalhes aberto={aberto} aoAlternar={() => setAberto((v) => !v)} />
         </div>
       </div>

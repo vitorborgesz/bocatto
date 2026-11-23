@@ -31,6 +31,7 @@ export function CartProvider({ children }) {
   const armazenado = useArmazenamentoLocal(CHAVES.carrinho);
   const carrinho = armazenado ?? CARRINHO_VAZIO;
 
+  // Devolve a quantidade desse produto no carrinho depois de adicionar.
   const adicionar = useCallback((produto, quantidade = 1) => {
     const { itens } = lerLocal(CHAVES.carrinho) ?? CARRINHO_VAZIO;
     const existe = itens.some((item) => item.id === produto.id);
@@ -41,6 +42,7 @@ export function CartProvider({ children }) {
       : [...itens, { ...dadosDoProduto(produto), quantidade: limitar(quantidade) }];
 
     salvarItens(novosItens);
+    return novosItens.find((item) => item.id === produto.id).quantidade;
   }, []);
 
   // Quantidade 0 remove o item; carrinho sem itens é esvaziado.

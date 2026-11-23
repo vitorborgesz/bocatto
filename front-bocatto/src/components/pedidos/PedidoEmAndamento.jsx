@@ -8,7 +8,8 @@ import { BadgeStatus, ETAPAS } from '@/components/pedidos/statusPedido';
 import { IconeCheck, IconeRelogio } from '@/components/ui/Icones';
 import { formatarDataPedido, formatarMoeda } from '@/utils/formatadores';
 
-// Card em destaque do pedido que ainda está a caminho, com a linha de progresso.
+// Card de um pedido que ainda não foi concluído: etapa atual na linha de progresso,
+// detalhes e o botão de cancelar (enquanto pendente).
 export default function PedidoEmAndamento({ pedido, aoAtualizar }) {
   const [aberto, setAberto] = useState(false);
 
@@ -29,7 +30,7 @@ export default function PedidoEmAndamento({ pedido, aoAtualizar }) {
 
       <Progresso status={pedido.status} />
 
-      <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <BotaoDetalhes aberto={aberto} aoAlternar={() => setAberto((v) => !v)} />
         <CancelarPedido pedido={pedido} aoCancelar={aoAtualizar} />
       </div>
@@ -38,7 +39,8 @@ export default function PedidoEmAndamento({ pedido, aoAtualizar }) {
   );
 }
 
-// Etapas concluídas ficam laranja; o trecho até a próxima etapa também (o pedido "está indo").
+// Etapas concluídas ficam laranja. A linha entre duas etapas só fica laranja quando
+// o pedido já chegou na etapa seguinte (ex.: "Saiu para entrega" não pinta até "Entregue").
 function Progresso({ status }) {
   const atual = ETAPAS.findIndex((etapa) => etapa.status === status);
 
@@ -52,7 +54,7 @@ function Progresso({ status }) {
             {!ultima && (
               <span
                 aria-hidden="true"
-                className={`absolute top-[7px] right-0 left-4 h-0.5 ${i <= atual ? 'bg-marca' : 'bg-borda'}`}
+                className={`absolute top-1.75 right-0 left-4 h-0.5 ${i < atual ? 'bg-marca' : 'bg-borda'}`}
               />
             )}
             <span

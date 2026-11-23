@@ -8,6 +8,7 @@ import ItemCarrinho from '@/components/carrinho/ItemCarrinho';
 import ResumoPedido, { classeBotaoResumo } from '@/components/carrinho/ResumoPedido';
 import { useDadosCarrinho } from '@/components/carrinho/useDadosCarrinho';
 import { IconeSeta } from '@/components/ui/Icones';
+import LinkVoltar from '@/components/ui/LinkVoltar';
 import { useCart } from '@/contexts/CartContext';
 
 // Tela /carrinho: itens com quantidade + resumo com subtotal, taxa de entrega e total.
@@ -16,8 +17,9 @@ export default function Carrinho() {
   const { taxa, removidos } = useDadosCarrinho();
 
   return (
-    <section className="pt-6 pb-12 sm:pt-12">
-      <p className="text-xs font-bold tracking-[0.14em] text-marca uppercase">Quase lá</p>
+    <section className="pt-4 pb-12 sm:pt-8">
+      <LinkVoltar href="/cardapio">Voltar</LinkVoltar>
+      <p className="mt-6 text-xs font-bold tracking-[0.14em] text-marca uppercase">Quase lá</p>
       <h1 className="mt-3 font-display text-5xl font-extrabold tracking-tight sm:text-6xl">Seu carrinho</h1>
 
       <AvisoRemovidos nomes={removidos} />

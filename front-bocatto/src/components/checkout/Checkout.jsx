@@ -10,6 +10,7 @@ import { useDadosCarrinho } from '@/components/carrinho/useDadosCarrinho';
 import CardEndereco from '@/components/checkout/CardEndereco';
 import FormEndereco from '@/components/checkout/FormEndereco';
 import { IconeMais, IconeSeta } from '@/components/ui/Icones';
+import LinkVoltar from '@/components/ui/LinkVoltar';
 import Mordida from '@/components/ui/Mordida';
 import { useCart } from '@/contexts/CartContext';
 import { mensagemDeErro } from '@/services/api';
@@ -58,10 +59,10 @@ export default function Checkout() {
     if (!enderecoId) return;
     setEnvio({ status: 'enviando' });
     try {
-      await criarPedido({ enderecoId, itens });
+      const pedido = await criarPedido({ enderecoId, itens });
       setEnvio({ status: 'feito' });
       limpar();
-      router.replace('/pedidos');
+      router.replace(`/pedido-confirmado?pedido=${pedido.id}`);
     } catch (erro) {
       setEnvio({
         status: 'erro',
@@ -72,20 +73,19 @@ export default function Checkout() {
     }
   };
 
-  // Pedido enviado: mostra a confirmação enquanto abre "Meus pedidos".
+  // Pedido enviado: segura a tela (o carrinho já foi esvaziado) enquanto abre a confirmação.
   if (envio.status === 'feito') {
     return (
-      <section className="flex flex-col items-center py-24 text-center">
-        <Mordida className="h-14 w-14 text-marca" />
-        <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight">Pedido enviado!</h1>
-        <p className="mt-2 text-suave">Já estamos levando você para acompanhar.</p>
-      </section>
+      <div aria-label="Carregando" className="flex justify-center py-24">
+        <Mordida className="h-8 w-8 animate-pulse text-marca" />
+      </div>
     );
   }
 
   return (
-    <section className="pt-6 pb-12 sm:pt-12">
-      <p className="text-xs font-bold tracking-[0.14em] text-marca uppercase">Último passo</p>
+    <section className="pt-4 pb-12 sm:pt-8">
+      <LinkVoltar href="/carrinho">Voltar</LinkVoltar>
+      <p className="mt-6 text-xs font-bold tracking-[0.14em] text-marca uppercase">Último passo</p>
       <h1 className="mt-3 font-display text-5xl font-extrabold tracking-tight sm:text-6xl">Onde entregamos?</h1>
 
       <AvisoRemovidos nomes={removidos} />

@@ -35,10 +35,10 @@ export default function MeusPedidos() {
   }, [buscar, tentativa]);
 
   const pedidos = dados.status === 'pronto' ? dados.pedidos : [];
-  // O pedido em andamento mais recente vai para o destaque; o resto fica na lista.
-  const destaque = pedidos.find((p) => EM_ANDAMENTO.includes(p.status));
-  const historico = pedidos.filter((p) => p !== destaque);
-  const temPedidoACaminho = Boolean(destaque);
+  // Todos os pedidos ainda não concluídos ganham o card com as etapas; o resto vai para o histórico.
+  const emAndamento = pedidos.filter((p) => EM_ANDAMENTO.includes(p.status));
+  const historico = pedidos.filter((p) => !EM_ANDAMENTO.includes(p.status));
+  const temPedidoACaminho = emAndamento.length > 0;
 
   // Atualização em segundo plano: só troca a tela se a busca der certo.
   useEffect(() => {
@@ -93,20 +93,41 @@ export default function MeusPedidos() {
         </div>
       )}
 
-      {destaque && (
-        <div className="mt-10">
-          <PedidoEmAndamento pedido={destaque} aoAtualizar={substituir} />
-        </div>
+      {emAndamento.length > 0 && (
+        <section className="mt-10" aria-labelledby="titulo-andamento">
+          <Titulo id="titulo-andamento" quantidade={emAndamento.length}>
+            Em andamento
+          </Titulo>
+          <div className="mt-4 space-y-4">
+            {emAndamento.map((pedido) => (
+              <PedidoEmAndamento key={pedido.id} pedido={pedido} aoAtualizar={substituir} />
+            ))}
+          </div>
+        </section>
       )}
 
       {historico.length > 0 && (
-        <ul className={destaque ? 'mt-6' : 'mt-10'}>
-          {historico.map((pedido) => (
-            <LinhaPedido key={pedido.id} pedido={pedido} aoAtualizar={substituir} />
-          ))}
-        </ul>
+        <section className="mt-10" aria-labelledby="titulo-historico">
+          <Titulo id="titulo-historico" quantidade={historico.length}>
+            Histórico
+          </Titulo>
+          <ul className="mt-2">
+            {historico.map((pedido) => (
+              <LinhaPedido key={pedido.id} pedido={pedido} />
+            ))}
+          </ul>
+        </section>
       )}
     </section>
+  );
+}
+
+function Titulo({ id, quantidade, children }) {
+  return (
+    <h2 id={id} className="flex items-baseline gap-2 font-display text-2xl font-bold tracking-tight">
+      {children}
+      <span className="font-sans text-sm font-normal text-suave tabular-nums">{quantidade}</span>
+    </h2>
   );
 }
 

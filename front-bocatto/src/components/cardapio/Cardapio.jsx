@@ -69,7 +69,7 @@ export default function Cardapio() {
         <ListaPorCategoria
           categorias={dados.categorias}
           produtos={dados.produtos}
-          categoriaId={categoriaEscolhida ?? dados.categorias[0].id}
+          categoriaId={categoriaEscolhida}
           aoEscolher={setCategoriaEscolhida}
         />
       )}
@@ -79,21 +79,25 @@ export default function Cardapio() {
   );
 }
 
+// categoriaId null = "Todos": o cardápio inteiro, separado por categoria.
 function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher }) {
-  const categoria = categorias.find((c) => c.id === categoriaId) ?? categorias[0];
-  const visiveis = produtos.filter((p) => p.categoria_id === categoria.id);
+  const escolhida = categorias.find((c) => c.id === categoriaId) ?? null;
+  const grupos = (escolhida ? [escolhida] : categorias).map((categoria) => ({
+    categoria,
+    itens: produtos.filter((p) => p.categoria_id === categoria.id),
+  }));
   // A "mordida" aparece uma vez só: no primeiro card sem foto.
-  const primeiroSemFoto = visiveis.find((p) => !p.imagem_url)?.id;
+  const primeiroSemFoto = grupos.flatMap((g) => g.itens).find((p) => !p.imagem_url)?.id;
 
   return (
     <>
       <div className="-mx-4 mt-10 overflow-x-auto px-4 [scrollbar-width:none]">
         <div role="tablist" className="inline-flex gap-2 rounded-full border border-borda bg-creme p-1.5">
-          {categorias.map((c) => {
-            const ativa = c.id === categoria.id;
+          {[{ id: null, nome: 'Todos' }, ...categorias].map((c) => {
+            const ativa = c.id === (escolhida?.id ?? null);
             return (
               <button
-                key={c.id}
+                key={c.id ?? 'todos'}
                 type="button"
                 role="tab"
                 aria-selected={ativa}
@@ -111,16 +115,27 @@ function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher }) {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        {visiveis.map((produto) => (
-          <CardProduto
-            key={produto.id}
-            produto={produto}
-            inicial={categoria.nome.charAt(0)}
-            comMordida={produto.id === primeiroSemFoto}
-          />
-        ))}
-      </div>
+      {grupos.map(({ categoria, itens }) => (
+        <section key={categoria.id} aria-label={categoria.nome}>
+          {/* Com "Todos", cada categoria ganha um título; com uma só, os chips já dizem qual é. */}
+          {!escolhida && (
+            <h2 className="mt-10 flex items-baseline gap-2 font-display text-2xl font-bold tracking-tight">
+              {categoria.nome}
+              <span className="font-sans text-sm font-normal text-suave tabular-nums">{itens.length}</span>
+            </h2>
+          )}
+          <div className={`grid gap-4 md:grid-cols-2 ${escolhida ? 'mt-6' : 'mt-4'}`}>
+            {itens.map((produto) => (
+              <CardProduto
+                key={produto.id}
+                produto={produto}
+                inicial={categoria.nome.charAt(0)}
+                comMordida={produto.id === primeiroSemFoto}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
     </>
   );
 }

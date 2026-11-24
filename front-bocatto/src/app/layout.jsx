@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata = {
   title: {
     default: 'Bocatto',
-    template: '%s | Bocatto',
+    template: '%s - Bocatto',
   },
   description:
     'Delivery do Bocatto: conheça o cardápio, monte seu pedido e acompanhe a entrega.',

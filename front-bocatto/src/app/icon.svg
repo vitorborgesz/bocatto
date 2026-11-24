@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Ícone da aba do navegador: a "mordida" da marca (mesmo desenho de components/ui/Mordida.jsx). -->
+  <mask id="mordida">
+    <rect width="24" height="24" fill="white" />
+    <circle cx="23.5" cy="8.5" r="3.4" fill="black" />
+    <circle cx="23" cy="14.5" r="3.4" fill="black" />
+  </mask>
+  <circle cx="12" cy="12" r="11" fill="#e8590c" mask="url(#mordida)" />
+</svg>

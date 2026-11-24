@@ -190,7 +190,7 @@ function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher, gest
 
   return (
     <>
-      <div className="-mx-4 mt-10 overflow-x-auto px-4 [scrollbar-width:none]">
+      <div className="-mx-4 mt-10 overflow-x-auto px-4 scrollbar-none">
         <div role="tablist" className="inline-flex gap-2 rounded-full border border-borda bg-creme p-1.5">
           {[{ id: null, nome: 'Todos' }, ...categorias].map((c) => {
             const ativa = c.id === (escolhida?.id ?? null);
@@ -268,7 +268,7 @@ function Esqueleto() {
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {[1, 2, 3, 4].map((n) => (
           <div key={n} className="flex h-40 overflow-hidden rounded-2xl border border-borda bg-white">
-            <div className="w-28 bg-marca-clara/60 sm:w-[135px]" />
+            <div className="w-28 bg-marca-clara/60 sm:w-33.75" />
             <div className="flex-1 space-y-3 p-5">
               <div className="h-5 w-1/2 rounded bg-borda" />
               <div className="h-3 w-5/6 rounded bg-borda/70" />

@@ -117,7 +117,7 @@ export default function PainelPedidos() {
 
       {dados.status === 'pronto' && (
         <>
-          <div className="-mx-4 mt-10 overflow-x-auto px-4 [scrollbar-width:none]">
+          <div className="-mx-4 mt-10 overflow-x-auto px-4 scrollbar-none">
             <div role="tablist" className="inline-flex gap-2 rounded-full border border-borda bg-creme p-1.5">
               {FILTROS.map((f) => {
                 const ativo = f.id === filtroId;

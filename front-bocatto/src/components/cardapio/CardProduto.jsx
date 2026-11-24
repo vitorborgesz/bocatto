@@ -37,7 +37,7 @@ export default function CardProduto({ produto, inicial, comMordida = false, gest
 
   return (
     <article className="flex min-h-40 overflow-hidden rounded-2xl border border-borda bg-white transition-shadow hover:shadow-[0_6px_24px_-12px_rgba(31,22,18,0.18)]">
-      <div className={`relative w-28 shrink-0 sm:w-[135px] ${produto.ativo === false ? 'opacity-40 grayscale' : ''}`}>
+      <div className={`relative w-28 shrink-0 sm:w-33.75 ${produto.ativo === false ? 'opacity-40 grayscale' : ''}`}>
         {temFoto ? (
           // Imagens vêm de URLs externas cadastradas pelo admin; <img> evita configurar domínios no next/image.
           // eslint-disable-next-line @next/next/no-img-element

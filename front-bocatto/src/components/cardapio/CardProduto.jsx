@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import ControlesAdmin from '@/components/cardapio/ControlesAdmin';
 import { IconeCheck, IconeMais } from '@/components/ui/Icones';
 import Mordida from '@/components/ui/Mordida';
 import { useAviso } from '@/contexts/AvisoContext';
@@ -9,7 +10,8 @@ import { useCart } from '@/contexts/CartContext';
 import { formatarMoeda } from '@/utils/formatadores';
 
 // Card horizontal: foto (ou placeholder com a inicial da categoria) + nome, descrição e preço.
-export default function CardProduto({ produto, inicial, comMordida = false }) {
+// gestao ({ aoAtualizar, aoEditar }) só é passado para o admin: mostra os controles do cardápio.
+export default function CardProduto({ produto, inicial, comMordida = false, gestao = null }) {
   const { adicionar } = useCart();
   const avisar = useAviso();
   const [adicionado, setAdicionado] = useState(false);
@@ -35,7 +37,7 @@ export default function CardProduto({ produto, inicial, comMordida = false }) {
 
   return (
     <article className="flex min-h-40 overflow-hidden rounded-2xl border border-borda bg-white transition-shadow hover:shadow-[0_6px_24px_-12px_rgba(31,22,18,0.18)]">
-      <div className="relative w-28 shrink-0 sm:w-[135px]">
+      <div className={`relative w-28 shrink-0 sm:w-[135px] ${produto.ativo === false ? 'opacity-40 grayscale' : ''}`}>
         {temFoto ? (
           // Imagens vêm de URLs externas cadastradas pelo admin; <img> evita configurar domínios no next/image.
           // eslint-disable-next-line @next/next/no-img-element
@@ -57,7 +59,14 @@ export default function CardProduto({ produto, inicial, comMordida = false }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h2 className="font-display text-lg leading-tight font-bold">{produto.nome}</h2>
+        <h2 className="flex flex-wrap items-center gap-x-2 font-display text-lg leading-tight font-bold">
+          {produto.nome}
+          {produto.ativo === false && (
+            <span className="rounded-full bg-zinc-200/70 px-2 py-0.5 font-sans text-[10px] font-semibold text-zinc-600">
+              Indisponível
+            </span>
+          )}
+        </h2>
         {produto.descricao && (
           <p className="mt-2 line-clamp-2 text-sm text-suave">{produto.descricao}</p>
         )}
@@ -66,17 +75,22 @@ export default function CardProduto({ produto, inicial, comMordida = false }) {
           <span className="font-display text-base font-bold text-marca tabular-nums">
             {formatarMoeda(produto.preco)}
           </span>
-          <button
-            type="button"
-            onClick={aoAdicionar}
-            aria-label={`Adicionar ${produto.nome} ao carrinho`}
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca ${
-              adicionado ? 'bg-sucesso' : 'bg-marca hover:bg-marca-escura'
-            }`}
-          >
-            {adicionado ? <IconeCheck className="h-4 w-4" /> : <IconeMais className="h-4 w-4" />}
-          </button>
+          {/* Indisponível não vai para o carrinho (a API também recusaria no pedido). */}
+          {produto.ativo !== false && (
+            <button
+              type="button"
+              onClick={aoAdicionar}
+              aria-label={`Adicionar ${produto.nome} ao carrinho`}
+              className={`flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca ${
+                adicionado ? 'bg-sucesso' : 'bg-marca hover:bg-marca-escura'
+              }`}
+            >
+              {adicionado ? <IconeCheck className="h-4 w-4" /> : <IconeMais className="h-4 w-4" />}
+            </button>
+          )}
         </div>
+
+        {gestao && <ControlesAdmin produto={produto} {...gestao} />}
       </div>
     </article>
   );

@@ -10,7 +10,7 @@ const classeInput =
   'h-9 min-w-0 flex-1 rounded-xl border border-borda bg-white px-3 text-sm outline-none placeholder:text-suave/60 focus:border-marca focus:ring-3 focus:ring-marca/15';
 const link = 'text-xs font-medium underline underline-offset-2 hover:text-marca disabled:opacity-40 disabled:no-underline';
 
-// Card lateral: lista, cria, renomeia e exclui categorias.
+// Conteúdo da janela "Categorias" do cardápio (só admin): lista, cria, renomeia e exclui.
 // aoMudar(lista) recebe a lista nova de categorias.
 export default function PainelCategorias({ categorias, contagem, aoMudar }) {
   const [nova, setNova] = useState('');
@@ -64,10 +64,8 @@ export default function PainelCategorias({ categorias, contagem, aoMudar }) {
   };
 
   return (
-    <aside className="rounded-2xl border border-borda bg-white p-6 lg:sticky lg:top-8">
-      <h2 className="font-display text-xl font-bold">Categorias</h2>
-
-      <ul className="mt-4">
+    <div className="mt-4">
+      <ul>
         {categorias.map((c) => (
           <li key={c.id} className="border-b border-borda py-3 last:border-b-0">
             {editando?.id === c.id ? (
@@ -163,6 +161,6 @@ export default function PainelCategorias({ categorias, contagem, aoMudar }) {
           {erro}
         </p>
       )}
-    </aside>
+    </div>
   );
 }

@@ -5,10 +5,13 @@ export function destinoSeguro(valor) {
   return valor?.startsWith('/') && !valor.startsWith('//') ? valor : null;
 }
 
-// Admin → painel; cliente → página que pediu o login ou o início (cardápio).
+// Volta para a página que pediu o login ou vai para o início (cardápio).
+// O admin usa o site como qualquer cliente e chega ao painel pelo menu.
+// Cliente nunca é mandado para /admin (lá ele seria barrado).
 export function destinoDoUsuario(usuario, voltar) {
-  if (usuario.perfil === 'admin') return voltar?.startsWith('/admin') ? voltar : '/admin';
-  return voltar && !voltar.startsWith('/admin') ? voltar : '/';
+  if (!voltar) return '/';
+  if (voltar.startsWith('/admin') && usuario.perfil !== 'admin') return '/';
+  return voltar;
 }
 
 // Mantém o ?voltar= ao trocar entre /login e /cadastro.

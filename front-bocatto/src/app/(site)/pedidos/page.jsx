@@ -1,13 +1,9 @@
-import AreaProtegida from '@/components/auth/AreaProtegida';
 import MeusPedidos from '@/components/pedidos/MeusPedidos';
 
 export const metadata = { title: 'Meus pedidos' };
 
-// Rota: /pedidos — exige login de cliente.
+// Rota: /pedidos — pedidos PESSOAIS de quem está logado (cliente ou admin).
+// O login é exigido pelo layout do site ((site)/layout.jsx). A gestão de todos os pedidos fica em /admin.
 export default function PedidosPage() {
-  return (
-    <AreaProtegida perfil="cliente">
-      <MeusPedidos />
-    </AreaProtegida>
-  );
+  return <MeusPedidos />;
 }

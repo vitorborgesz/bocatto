@@ -14,13 +14,18 @@ const LINKS = [
   { href: '/cardapio', rotulo: 'Cardápio', ativos: ['/', '/cardapio'] },
   { href: '/pedidos', rotulo: 'Meus pedidos', ativos: ['/pedidos'] },
 ];
+const LINK_PAINEL = { href: '/admin', rotulo: 'Painel', ativos: ['/admin'] };
 
 const botaoRedondo =
   'relative flex h-10 w-10 items-center justify-center rounded-full border border-borda bg-white transition-colors hover:border-tinta';
 
-export default function HeaderCliente() {
+// Header do site, igual para todos. O admin vê também o link "Painel".
+export default function Header() {
   const caminho = usePathname();
   const { quantidadeTotal } = useCart();
+  const { usuario } = useAuth();
+  // O admin vê também o atalho para o painel de gestão.
+  const links = usuario?.perfil === 'admin' ? [...LINKS, LINK_PAINEL] : LINKS;
 
   return (
     <header className="border-b border-borda bg-creme">
@@ -31,7 +36,7 @@ export default function HeaderCliente() {
         </Link>
 
         <nav className="hidden h-full items-center gap-8 text-sm sm:flex">
-          {LINKS.map(({ href, rotulo, ativos }) => {
+          {links.map(({ href, rotulo, ativos }) => {
             const ativo = ativos.includes(caminho);
             return (
               <Link
@@ -110,7 +115,7 @@ function MenuUsuario() {
           </Link>
           {usuario.perfil === 'admin' && (
             <Link href="/admin" onClick={fechar} className={item}>
-              Painel do admin
+              Painel
             </Link>
           )}
           <button

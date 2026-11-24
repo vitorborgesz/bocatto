@@ -10,7 +10,7 @@ export function taxaEntrega(req, res) {
   res.json({ taxa_entrega: env.TAXA_ENTREGA.toFixed(2) });
 }
 
-// --- Cliente ---
+// --- Pedidos pessoais (cliente ou admin) ---
 
 export async function criar(req, res) {
   const pedido = await pedidoService.criar(req.usuario.id, req.body);

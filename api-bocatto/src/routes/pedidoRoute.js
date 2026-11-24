@@ -6,18 +6,20 @@ import { validar } from '../middlewares/validacaoMiddleware.js';
 import { pedidoSchema, statusPedidoSchema } from '../utils/pedidoSchema.js';
 
 const router = Router();
-const somenteCliente = [autenticar, exigirPerfil('cliente')];
+// Uso pessoal (qualquer conta: o admin também compra). Cada um só vê e mexe nos PRÓPRIOS pedidos.
+const usuarioLogado = [autenticar, exigirPerfil('cliente', 'admin')];
+// Gestão: pedidos de todos os clientes.
 const somenteAdmin = [autenticar, exigirPerfil('admin')];
 
 // Público: o carrinho mostra a taxa antes do login.
 router.get('/taxa-entrega', pedidoController.taxaEntrega);
 
-// Cliente
-router.post('/', somenteCliente, validar(pedidoSchema), pedidoController.criar);
-router.get('/meus', somenteCliente, pedidoController.listarMeus);
-router.patch('/:id/cancelar', somenteCliente, pedidoController.cancelar);
+// Pedidos pessoais (cliente ou admin)
+router.post('/', usuarioLogado, validar(pedidoSchema), pedidoController.criar);
+router.get('/meus', usuarioLogado, pedidoController.listarMeus);
+router.patch('/:id/cancelar', usuarioLogado, pedidoController.cancelar);
 
-// Admin
+// Gestão (só admin)
 router.get('/', somenteAdmin, pedidoController.listarTodos);
 router.patch('/:id/status', somenteAdmin, validar(statusPedidoSchema), pedidoController.alterarStatus);
 

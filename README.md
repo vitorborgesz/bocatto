@@ -50,16 +50,21 @@ preparo e entrega, e manter o cardápio atualizado.
   - pedidos concluídos ficam no histórico;
   - um pedido pode ser cancelado enquanto ainda estiver pendente.
 
-### Administrador (painel em `/admin`)
+### Administrador
 
-- **Pedidos:**
-  - fila com filtros por status e o total de pedidos e de vendas do dia;
-  - um botão para o próximo passo de cada pedido, e cancelamento com confirmação;
-  - a lista se atualiza sozinha a cada 15 segundos.
-- **Cardápio:**
-  - cadastrar, editar e excluir produtos;
-  - deixar um produto disponível ou indisponível com um interruptor;
-  - criar, renomear e excluir categorias.
+O admin usa **as mesmas páginas** que o cliente: navega pelo cardápio, monta o
+carrinho, faz pedidos e acompanha os **próprios** pedidos em "Meus pedidos". Ele tem
+só dois recursos a mais:
+
+1. **Gestão do cardápio, na própria página do cardápio:**
+   - vê também os produtos indisponíveis (apagados) e as categorias vazias;
+   - botões "Editar categorias" (criar, renomear, excluir) e "Novo produto" no topo;
+   - em cada card: interruptor de disponível, "Editar" e excluir.
+2. **Painel em `/admin`** (link "Painel" no menu), a única página exclusiva dele,
+   com a gestão dos pedidos de todos os clientes:
+   - fila com filtros por status e o total de pedidos e de vendas do dia;
+   - um botão para o próximo passo de cada pedido, e cancelamento com confirmação;
+   - a lista se atualiza sozinha a cada 15 segundos.
 
 ---
 
@@ -143,15 +148,15 @@ front-bocatto/
 └── src/
     ├── app/                # rotas (cada pasta é uma URL)
     │   ├── (auth)/         # /login e /cadastro
-    │   ├── (cliente)/      # /, /cardapio, /carrinho, /checkout, /pedido-confirmado, /pedidos
-    │   └── admin/          # /admin (pedidos) e /admin/cardapio
+    │   └── (site)/         # páginas comuns a todos: /, /cardapio, /carrinho, /checkout,
+    │                       #   /pedido-confirmado, /pedidos e /admin (só esta exige admin)
     ├── components/         # telas e peças por assunto: cardapio, carrinho, checkout, pedidos, admin, auth, layout, ui
     ├── contexts/           # AuthContext (sessão), CartContext (carrinho), AvisoContext (avisos)
     ├── services/           # funções que chamam a API (api.js configura o axios)
     └── utils/              # formatação de moeda e datas, e acesso ao localStorage
 ```
 
-As pastas entre parênteses, como `(cliente)`, são **grupos de rotas** do Next: não
+As pastas entre parênteses, como `(site)`, são **grupos de rotas** do Next: não
 aparecem na URL e servem para compartilhar um layout. Todas as páginas do cliente,
 por exemplo, têm o mesmo header e exigem login.
 
@@ -220,9 +225,16 @@ Também é possível criar uma conta de cliente nova em `/cadastro`.
    toda requisição (`Authorization: Bearer ...`).
 4. Em cada rota protegida, o middleware `autenticar` valida o token e **lê o usuário
    no banco**, para pegar o perfil atualizado e recusar contas desativadas.
-   `exigirPerfil('admin')` ou `exigirPerfil('cliente')` libera a rota só para aquele perfil.
+   Depois, `exigirPerfil(...)` libera a rota só para os perfis listados:
+   - **uso pessoal** (pedidos e endereços próprios): `exigirPerfil('cliente', 'admin')`.
+     O admin também compra, e cada um só vê os próprios dados;
+   - **gestão** (todos os pedidos, produtos, categorias): `exigirPerfil('admin')`.
+     O cliente recebe **403**.
 5. No front, `AreaProtegida` manda para `/login` quem não está logado e guarda a
-   página de origem (`?voltar=`), para voltar a ela depois do login. Se a API
+   página de origem (`?voltar=`), para voltar a ela depois do login. Todas as páginas
+   usam o mesmo layout. Só a página `/admin` exige o perfil admin: um cliente que
+   tentar abri-la vai para o início. Os controles de gestão (link "Painel" e as opções
+   do cardápio) só aparecem para o admin. Se a API
    responder 401 (token vencido), a sessão é encerrada e a tela volta para o login.
 
 > A proteção que vale é a da **API**. O front só esconde as telas, e um usuário
@@ -261,8 +273,8 @@ pendente ──► em_preparo ──► saiu_para_entrega ──► entregue
 
 | Quem | Pode fazer |
 |---|---|
-| Admin | avançar para o próximo status; cancelar enquanto está `pendente` ou `em_preparo` |
-| Cliente | cancelar só enquanto está `pendente` |
+| Admin, na gestão (`/admin`) | avançar qualquer pedido para o próximo status; cancelar enquanto está `pendente` ou `em_preparo` |
+| Quem fez o pedido (cliente ou admin) | cancelar o próprio pedido só enquanto está `pendente` |
 
 As regras ficam na API (`TRANSICOES_ADMIN` em `pedidoService.js`). A troca de status
 usa `UPDATE ... WHERE status = <status lido>`. Se o cliente cancelar no mesmo
@@ -333,7 +345,8 @@ já marcam as migrations e os seeders como aplicados.
 
 ## 7. API: rotas
 
-Base: `http://localhost:4444`. Corpo e respostas em JSON.
+Base: `http://localhost:4444`. Corpo e respostas em JSON. Na coluna "Acesso",
+**logado** quer dizer cliente ou admin, e **admin** quer dizer só admin.
 
 **Erros:**
 - formato padrão: `{ "erro": "mensagem" }`;
@@ -351,12 +364,12 @@ Base: `http://localhost:4444`. Corpo e respostas em JSON.
 | GET | `/produtos` | público | cardápio: só produtos disponíveis (`?categoria_id=`) |
 | GET | `/produtos/todos` | admin | todos, inclusive indisponíveis |
 | POST · PUT · DELETE | `/produtos`, `/produtos/:id` | admin | cria, edita (parcial), exclui |
-| GET · POST | `/enderecos` | cliente | lista / cadastra os próprios endereços |
-| PUT · DELETE | `/enderecos/:id` | cliente | edita / exclui um endereço próprio |
+| GET · POST | `/enderecos` | logado | lista / cadastra os próprios endereços |
+| PUT · DELETE | `/enderecos/:id` | logado | edita / exclui um endereço próprio |
 | GET | `/pedidos/taxa-entrega` | público | `{ "taxa_entrega": "5.00" }` |
-| POST | `/pedidos` | cliente | cria `{ endereco_id, itens: [{ produto_id, quantidade }] }` |
-| GET | `/pedidos/meus` | cliente | pedidos do cliente, com itens |
-| PATCH | `/pedidos/:id/cancelar` | cliente | cancela (só `pendente`) |
+| POST | `/pedidos` | logado | cria um pedido pessoal `{ endereco_id, itens: [{ produto_id, quantidade }] }` |
+| GET | `/pedidos/meus` | logado | os próprios pedidos, com itens |
+| PATCH | `/pedidos/:id/cancelar` | logado | cancela um pedido próprio (só `pendente`) |
 | GET | `/pedidos` | admin | todos os pedidos, com itens e cliente (`?status=`) |
 | PATCH | `/pedidos/:id/status` | admin | `{ status }`, seguindo o fluxo |
 
@@ -378,13 +391,12 @@ Base: `http://localhost:4444`. Corpo e respostas em JSON.
 |---|---|---|
 | `/login` | entrar | todos (primeira tela) |
 | `/cadastro` | criar conta | todos |
-| `/` e `/cardapio` | cardápio com categorias e "Todos" | logado |
+| `/` e `/cardapio` | cardápio com categorias e "Todos" (o admin vê também a gestão do cardápio) | logado |
 | `/carrinho` | itens, quantidades e resumo | logado |
-| `/checkout` | escolher ou cadastrar o endereço e confirmar | cliente |
-| `/pedido-confirmado` | confirmação com o número do pedido | cliente |
-| `/pedidos` | pedidos em andamento (com etapas) e histórico | cliente |
-| `/admin` | fila de pedidos | admin |
-| `/admin/cardapio` | produtos e categorias | admin |
+| `/checkout` | escolher ou cadastrar o endereço e confirmar | logado |
+| `/pedido-confirmado` | confirmação com o número do pedido | logado |
+| `/pedidos` | os próprios pedidos: em andamento (com etapas) e histórico | logado |
+| `/admin` | painel: pedidos de todos os clientes | **só admin** |
 
 ### Padrões usados no código
 

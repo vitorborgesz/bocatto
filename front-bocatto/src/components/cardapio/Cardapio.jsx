@@ -3,34 +3,81 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import ConfirmarExclusao from '@/components/admin/ConfirmarExclusao';
+import FormProduto from '@/components/admin/FormProduto';
+import PainelCategorias from '@/components/admin/PainelCategorias';
 import CardProduto from '@/components/cardapio/CardProduto';
+import { IconeMais } from '@/components/ui/Icones';
+import Modal from '@/components/ui/Modal';
+import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { mensagemDeErro } from '@/services/api';
-import { listarCategorias, listarProdutos } from '@/services/cardapioService';
+import { listarCategorias, listarProdutos, listarTodosProdutos } from '@/services/cardapioService';
 import { formatarMoeda } from '@/utils/formatadores';
 
-// Cardápio público (tela inicial e /cardapio): chips de categoria + produtos ativos.
+// Cardápio (tela inicial e /cardapio): chips de categoria + produtos. Mesma página para todos.
+// Cliente: só os produtos disponíveis.
+// Admin: todos os produtos e categorias, mais a gestão do cardápio nesta mesma tela
+// (novo produto, editar, excluir, disponível e categorias). A API confere o perfil em cada ação.
 export default function Cardapio() {
+  const { usuario } = useAuth();
+  const ehAdmin = usuario?.perfil === 'admin';
   const [dados, setDados] = useState({ status: 'carregando' });
   const [tentativa, setTentativa] = useState(0);
   const [categoriaEscolhida, setCategoriaEscolhida] = useState(null);
+  // Gestão (só admin): undefined = fechado; null = novo produto; objeto = edição.
+  const [editando, setEditando] = useState(undefined);
+  const [excluindo, setExcluindo] = useState(null);
+  const [categoriasAbertas, setCategoriasAbertas] = useState(false);
 
   useEffect(() => {
     let ativo = true;
-    Promise.all([listarCategorias(), listarProdutos()])
-      .then(([categorias, produtos]) => {
-        if (!ativo) return;
-        // Só mostra categorias que têm algum produto disponível.
-        const comProdutos = categorias.filter((c) => produtos.some((p) => p.categoria_id === c.id));
-        setDados({ status: 'pronto', categorias: comProdutos, produtos });
-      })
+    // GET /produtos/todos é só para admin: a API recusa (403) se um cliente tentar.
+    Promise.all([listarCategorias(), ehAdmin ? listarTodosProdutos() : listarProdutos()])
+      .then(([categorias, produtos]) => ativo && setDados({ status: 'pronto', categorias, produtos }))
       .catch((erro) => {
         if (ativo) setDados({ status: 'erro', mensagem: mensagemDeErro(erro, 'Não foi possível carregar o cardápio.') });
       });
     return () => {
       ativo = false;
     };
-  }, [tentativa]);
+  }, [tentativa, ehAdmin]);
+
+  const categorias = dados.categorias ?? [];
+  const produtos = dados.produtos ?? [];
+  // Cliente: só categorias com produto. Admin: todas (para poder preencher uma categoria vazia).
+  const categoriasVisiveis = ehAdmin ? categorias : categorias.filter((c) => produtos.some((p) => p.categoria_id === c.id));
+  const contagem = Object.fromEntries(
+    categorias.map((c) => [c.id, produtos.filter((p) => p.categoria_id === c.id).length]),
+  );
+
+  // Produto criado ou editado. A API devolve sem a categoria: completa com a da lista.
+  const salvarProduto = (salvo) => {
+    setDados((atual) => {
+      const categoria = atual.categorias.find((c) => c.id === salvo.categoria_id);
+      const produto = { ...salvo, categoria: categoria ? { id: categoria.id, nome: categoria.nome } : null };
+      const existe = atual.produtos.some((p) => p.id === produto.id);
+      const lista = existe ? atual.produtos.map((p) => (p.id === produto.id ? produto : p)) : [...atual.produtos, produto];
+      return { ...atual, produtos: lista.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')) };
+    });
+    setEditando(undefined);
+  };
+
+  const removerProduto = (id) => {
+    setDados((atual) => ({ ...atual, produtos: atual.produtos.filter((p) => p.id !== id) }));
+    setExcluindo(null);
+  };
+
+  // Categoria criada, renomeada ou excluída: atualiza também o nome mostrado nos produtos.
+  const mudarCategorias = (lista) =>
+    setDados((atual) => ({
+      ...atual,
+      categorias: lista,
+      produtos: atual.produtos.map((p) => {
+        const categoria = lista.find((c) => c.id === p.categoria_id);
+        return categoria ? { ...p, categoria: { id: categoria.id, nome: categoria.nome } } : p;
+      }),
+    }));
 
   const tentarDeNovo = () => {
     setDados({ status: 'carregando' });
@@ -42,6 +89,28 @@ export default function Cardapio() {
       <p className="text-xs font-bold tracking-[0.14em] text-marca uppercase">Escolha sem pressa</p>
       <h1 className="mt-3 font-display text-5xl font-extrabold tracking-tight sm:text-6xl">Cardápio</h1>
       <p className="mt-3 text-suave">Tem coisa boa em todas as direções.</p>
+
+      {ehAdmin && dados.status === 'pronto' && (
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setCategoriasAbertas(true)}
+            className="h-11 rounded-full border border-borda bg-white px-6 text-sm font-semibold transition-colors hover:border-tinta"
+          >
+            Editar categorias
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditando(null)}
+            disabled={categorias.length === 0}
+            title={categorias.length === 0 ? 'Crie uma categoria primeiro' : undefined}
+            className="flex h-11 items-center gap-2 rounded-full bg-marca px-6 text-sm font-semibold text-white transition-colors hover:bg-marca-escura disabled:opacity-60"
+          >
+            <IconeMais className="h-4 w-4" />
+            Novo produto
+          </button>
+        </div>
+      )}
 
       {dados.status === 'carregando' && <Esqueleto />}
 
@@ -59,28 +128,58 @@ export default function Cardapio() {
         </div>
       )}
 
-      {dados.status === 'pronto' && dados.categorias.length === 0 && (
+      {dados.status === 'pronto' && categoriasVisiveis.length === 0 && (
         <p className="mt-10 rounded-2xl border border-borda bg-white p-8 text-center text-suave">
-          O cardápio está sendo preparado. Volte daqui a pouco!
+          {ehAdmin ? 'Nenhuma categoria ainda. Comece por "Editar categorias".' : 'O cardápio está sendo preparado. Volte daqui a pouco!'}
         </p>
       )}
 
-      {dados.status === 'pronto' && dados.categorias.length > 0 && (
+      {dados.status === 'pronto' && categoriasVisiveis.length > 0 && (
         <ListaPorCategoria
-          categorias={dados.categorias}
-          produtos={dados.produtos}
+          categorias={categoriasVisiveis}
+          produtos={produtos}
           categoriaId={categoriaEscolhida}
           aoEscolher={setCategoriaEscolhida}
+          gestao={ehAdmin ? { aoAtualizar: salvarProduto, aoEditar: setEditando, aoExcluir: setExcluindo } : null}
         />
       )}
 
       <BarraCarrinho />
+
+      {ehAdmin && (
+        <>
+          <Modal
+            aberto={editando !== undefined}
+            aoFechar={() => setEditando(undefined)}
+            titulo={editando ? 'Editar produto' : 'Novo produto'}
+          >
+            <FormProduto
+              key={editando?.id ?? 'novo'}
+              produto={editando ?? null}
+              categorias={categorias}
+              categoriaInicial={categoriaEscolhida}
+              aoSalvar={salvarProduto}
+              aoCancelar={() => setEditando(undefined)}
+            />
+          </Modal>
+
+          <Modal aberto={Boolean(excluindo)} aoFechar={() => setExcluindo(null)} titulo="Excluir produto?">
+            {excluindo && (
+              <ConfirmarExclusao produto={excluindo} aoExcluir={removerProduto} aoCancelar={() => setExcluindo(null)} />
+            )}
+          </Modal>
+
+          <Modal aberto={categoriasAbertas} aoFechar={() => setCategoriasAbertas(false)} titulo="Categorias">
+            <PainelCategorias categorias={categorias} contagem={contagem} aoMudar={mudarCategorias} />
+          </Modal>
+        </>
+      )}
     </section>
   );
 }
 
 // categoriaId null = "Todos": o cardápio inteiro, separado por categoria.
-function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher }) {
+function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher, gestao }) {
   const escolhida = categorias.find((c) => c.id === categoriaId) ?? null;
   const grupos = (escolhida ? [escolhida] : categorias).map((categoria) => ({
     categoria,
@@ -124,6 +223,9 @@ function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher }) {
               <span className="font-sans text-sm font-normal text-suave tabular-nums">{itens.length}</span>
             </h2>
           )}
+          {itens.length === 0 && (
+            <p className={`text-sm text-suave ${escolhida ? 'mt-6' : 'mt-4'}`}>Nenhum produto nesta categoria ainda.</p>
+          )}
           <div className={`grid gap-4 md:grid-cols-2 ${escolhida ? 'mt-6' : 'mt-4'}`}>
             {itens.map((produto) => (
               <CardProduto
@@ -131,6 +233,7 @@ function ListaPorCategoria({ categorias, produtos, categoriaId, aoEscolher }) {
                 produto={produto}
                 inicial={categoria.nome.charAt(0)}
                 comMordida={produto.id === primeiroSemFoto}
+                gestao={gestao}
               />
             ))}
           </div>

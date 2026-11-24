@@ -7,8 +7,8 @@ import { enderecoAtualizacaoSchema, enderecoSchema } from '../utils/enderecoSche
 
 const router = Router();
 
-// Todas as rotas de endereço são do cliente logado.
-router.use(autenticar, exigirPerfil('cliente'));
+// Endereços pessoais de quem está logado (cliente ou admin): cada um só vê os próprios.
+router.use(autenticar, exigirPerfil('cliente', 'admin'));
 
 router.get('/', enderecoController.listar);
 router.post('/', validar(enderecoSchema), enderecoController.criar);
